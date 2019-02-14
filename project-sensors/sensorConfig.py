@@ -15,7 +15,6 @@ class SensorConfig:
         sensor_read_delay,
         api_running_flag,
         sensor_running_flag,
-        ingestion_file_path,
         logging_level
         ):
         self.host                  = host
@@ -30,7 +29,6 @@ class SensorConfig:
         self.sensor_read_delay     = sensor_read_delay 
         self.api_running_flag      = api_running_flag 
         self.sensor_running_flag   = sensor_running_flag
-        self.ingestion_file_path   = ingestion_file_path
         self.logging_level         = logging_level
 
 with open('./config.json') as config_file:
@@ -63,7 +61,6 @@ config = SensorConfig(
     sensor_read_delay     = loadConfig['sensors']['sensor_read_delay'],
     api_running_flag      = loadConfig['sensors']['api_running_flag'],
     sensor_running_flag   = loadConfig['sensors']['sensor_running_flag'],
-    ingestion_file_path   = loadConfig['sensors']['ingestion_file_path'],
     logging_level         = loggingLevel(loadConfig['sensors']['logging-level']),
 )
 

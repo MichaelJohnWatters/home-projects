@@ -1,18 +1,17 @@
 {
     "sensors": {
-        "host" : "0.0.0.0",
-        "port" :80,
-        "debug" : false,
-        "sensor_type" : "Adafruit_DHT.DHT22",
-        "sensor_pin_4_inside" : 4,
+        "host"                  : "0.0.0.0",
+        "port"                  : 80,
+        "debug"                 : false,
+        "sensor_type"           : "Adafruit_DHT.DHT22",
+        "sensor_pin_4_inside"   : 4,
         "sensor_pin_22_outside" : 22,
         "sensor_thread_running" : true,
-        "sensor_retry" : true,
-        "sensor_grouping_size" : 20,
-        "sensor_read_delay" : 60,
-        "api_running_flag" : true,
-        "sensor_running_flag" : true,
-        "ingestion_file_path": "ingest.txt",
-        "logging-level": "INFO"
+        "sensor_retry"          : true,
+        "sensor_grouping_size"  : 60,
+        "sensor_read_delay"     : 58,
+        "api_running_flag"      : true,
+        "sensor_running_flag"   : true,
+        "logging-level"         : "INFO"
     }
 }

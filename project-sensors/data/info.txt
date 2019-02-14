@@ -1,4 +1,0 @@
-bin/post-index-task --file data/temp.json --url http://localhost:8081
-
-
-this commands will ingest for us.

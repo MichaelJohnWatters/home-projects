@@ -1,6 +1,4 @@
 #!/bin/bash
-echo "STARTING BASH SCRIPT..."
-echo "STARTING HOME-PROJECTS DOCKER-COMPOSE UP"
-sudo docker-compose up
-echo "FINISHED START HOME-PROJECTS"
+cd project-sensors && sudo python3 api.py
+
 

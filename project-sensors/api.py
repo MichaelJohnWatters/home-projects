@@ -1,18 +1,18 @@
+import os
 import time
 import json
-import os
+import psutil
 import logging
+import requests
 import threading
 import sensorConfig
 import Adafruit_DHT
 import sensorLogging
-import requests
-from gpiozero import CPUTemperature
 from   flask         import Flask
 from   flask_restful import Api, Resource
 from   datetime      import datetime  
 from   datetime      import timedelta
-import psutil
+from   gpiozero      import CPUTemperature
 
 #Config
 config = sensorConfig.config
@@ -27,19 +27,15 @@ last_read_datetime       = 0.0
 #list of grouped reads, to reduce http requests sent to druid by grouping reads.
 list_sensor_reads = list()
 
-def postDruidIngestionTask():
+def druidBashIngestionTask():
     sensorLogging.logger.info('POST http://localhost:8081 Druid ingestion Task')
-    #Probably should replace with post request instead of this bash command tho we gett logging from druid and stuff,
-    # so might acctualy keep it.
     os.system("bin/post-index-task --file data/druidSpec.json --url http://localhost:8081")
     
 def writeToFile(content, file_path):
     f = open("./data/ingest.json", "w")
     f.write(toDruidFormattedJson(list_sensor_reads))
     f.close()
-    sensorLogging.logger.info('druid data written to ./project-sensors/data/ingest.json')
-    postDruidIngestionTask()
-
+    druidBashIngestionTask()
 
 #Endpoint Class
 class SensorNow(Resource):
@@ -95,7 +91,7 @@ def toDruidFormattedJson(listOfReads):
         arrayOfReadsAsJson.append(json.dumps(responseOutside))
 
     for item in arrayOfReadsAsJson:
-        mystr = str(item)
+        mystr = item
         if jsonString == "":
             jsonString += mystr 
         else: 
@@ -160,48 +156,48 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
 
         #if max group size reached, write to file for druid to pick up
         if len(list_sensor_reads) >= groupingSize:
-
-            #Write to file for druid to ingest
             writeToFile(toDruidFormattedJson(list_sensor_reads),"./data/ingest.json")
-
-            #clear the current group
             list_sensor_reads = list()
-
-        time.sleep(readDelay)
+        else:
+            time.sleep(readDelay)
 
 def readSensors(sensor_type, sensor_pin_4_inside, sensor_pin_22_outside, bool_sensor_retry):
-    # sometimes reads occur when sensor does not have a value to return, retry makes sure a value gets returned.
-    # TODO change to not continously, maybee try 3-5 times then throw error.
+    timestamp = datetime.now()
     if bool_sensor_retry == True:
         humidity1, temperature1 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_4_inside)
         humidity2, temperature2 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_22_outside)
-        sensorLogging.logger.info('Finished reading Adafruit_DHT.22 sensors, ' +f'CPU usage: {psutil.cpu_percent()}%, '+f'Temperature: {CPUTemperature().temperature}C, ' +f'Memory usage: {psutil.virtual_memory()[2]}%')
-        return (SensorValue(temperature1,humidity1), SensorValue(temperature2,humidity2), datetime.now()) 
+        humidity1 = humidity1+15
+        sensorLogging.logger.info(f'Finished reading Adafruit_DHT.22, inside  Temperature: {temperature1}C, Humdity: {humidity1}%')
+        sensorLogging.logger.info(f'Finished reading Adafruit_DHT.22, outside Temperature: {temperature2}C, Humdity: {humidity2}%')
+        sensorLogging.logger.info('Resource stats: ' +f'CPU usage: {psutil.cpu_percent()}%, '+f'Temperature: {CPUTemperature().temperature}C, ' +f'Memory usage: {psutil.virtual_memory()[2]}%')
+        return (SensorValue(temperature1, humidity1), SensorValue(temperature2, humidity2), timestamp) 
     else:
         humidity1, temperature1 = Adafruit_DHT.read(sensor_type, sensor_pin_4_inside)
         humidity2, temperature2 = Adafruit_DHT.read(sensor_type, sensor_pin_22_outside)
         if humidity1 is not None and temperature1 is not None and humidity2 is not None and temperature2 is not None:
-            return (SensorValue(temperature1,humidity1), SensorValue(temperature2,humidity2), datetime.now())
+            return (SensorValue(temperature1,humidity1), SensorValue(temperature2,humidity2), timestamp)
         else:
             raise Exception("retry off, not all reads succedded")
 
-# Start new Threads
-SensorThread(
-    "Sensors",
-    config.sensor_running_flag,
-    config.sensor_read_delay,
-    config.sensor_type,
-    config.sensor_pin_4_inside,
-    config.sensor_pin_22_outside,
-    config.sensor_retry,
-    config.sensor_grouping_size
+def main():
+    SensorThread(
+        "Sensors",
+        config.sensor_running_flag,
+        config.sensor_read_delay,
+        config.sensor_type,
+        config.sensor_pin_4_inside,
+        config.sensor_pin_22_outside,
+        config.sensor_retry,
+        config.sensor_grouping_size
     ).start()
 
-ApiThread(
-    "Api",
-    config.host, 
-    config.port, 
-    config.debug
-).start()
+    ApiThread(
+        "Api",
+        config.host, 
+        config.port, 
+        config.debug
+    ).start()
 
-sensorLogging.logger("Exiting main thread.")
+
+if __name__ == '__main__':
+    main()
