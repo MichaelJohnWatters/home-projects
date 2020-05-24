@@ -1,12 +1,10 @@
 version: '3'
 
 services:
-    go-api-service:
-        build: ./project-go-api
-        volumes: 
-            - ./project-go-api:/usr/src/app
+    go-service:
+        build: ./project-go-api/src/github.com.michaeljohnwatters.project.go.api
         ports:
-            - 5000:80
+            - 5000:8080
     sensors-service:
         build: ./project-sensors
         volumes: 

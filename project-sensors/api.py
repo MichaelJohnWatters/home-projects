@@ -3,10 +3,11 @@ from flask_restful import Resource, Api
 import Adafruit_DHT
 import time
 
-# TODO instead of trying to read sensor values on call
+# TODO instead of trying to read sensor values on request
 # create 2 threads one for the api and one for the sensors.
 # Continuosuly record sensor values.
 # return the most recent value.
+# will eventualy post to druid db.
 
 DHT_SENSOR = Adafruit_DHT.DHT22
 DHT_PIN_4 = 4
@@ -28,8 +29,8 @@ api = Api(app)
 
 class Sensor(Resource):
     def get(self):
-        sensor_1_val = readSensor(DHT_SENSOR, DHT_PIN_4, False)
-        sensor_2_val = readSensor(DHT_SENSOR, DHT_PIN_22, False)
+        sensor_1_val = readSensor(DHT_SENSOR, DHT_PIN_4, True)
+        sensor_2_val = readSensor(DHT_SENSOR, DHT_PIN_22, True)
 
         return {
             'sensor1':[
