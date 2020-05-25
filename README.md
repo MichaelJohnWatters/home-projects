@@ -1,5 +1,18 @@
 # home-projects
 
+do I try to get druid on run on some arm64?
+or do i just run druid on a different pc
+and have some ssh script to start it up, when i run docker.
+
+current project is running on rasbian, which is armhf 32-bit
+
+
+Needed
+docker
+docker-compose
+adafruit_blinka
+
+
 
 
 test project-go-api DockerFile
