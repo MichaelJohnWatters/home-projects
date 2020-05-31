@@ -85,6 +85,20 @@ Note if you dont know your devices ip you can in a pi terminal run(might have to
 From windows, download https://www.putty.org/
 And use this app too ssh(this is what I use atm).
 
+Finally run druid (only use nano-quick-start, pi wont be able to cope with anything else).
+
+Running Druid:
+cd into where ever you installed apache druid.
+- cd /repo/apache-druid-0.18.1./
+Finally run nano quick start 
+- ./bin/start-nano-quickstart
+
+Navigate to (your pi's device ip)
+http://XXX.XXX.XXX.XXX:8888
+
+DONE!
+
+now refer to druid docs on how druid works https://druid.apache.org/docs/latest/tutorials/index.html
 
 
 
