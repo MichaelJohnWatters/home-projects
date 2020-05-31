@@ -1,5 +1,7 @@
 add - pip install flask-restful
+add pip3 install flask-restful
 
+I think a bunch of stuff needs to be installed in docker files, cause it seems to need to be downloaded, and i guess ut looks localy? if you dont say where to get it.
 
 
 # home-projects
