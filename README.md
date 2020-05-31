@@ -16,7 +16,7 @@ boot os 2020-05-27-raspios-buster-arm64.img
 Use rasberry pi imager to load os on to your ssd.
 - https://www.raspberrypi.org/downloads/ 
 
-- insert sd card
+- insert sd card,(as ssd would probably be better but i used a 32gb sd card)
 
 - attach sensors, by default the app uses pin 4 and pin 22 for data between sensor and pi.
 
