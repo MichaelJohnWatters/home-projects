@@ -30,7 +30,7 @@ After normal setup:
 
 Install Docker and docker-compose
 - sudo apt install docker
--sudo apt install docker-compose
+- sudo apt install docker-compose
 
 Druid
 Needs java 8 for druid, java 8 not realy supported for rasberry pi os 64/deb buster
