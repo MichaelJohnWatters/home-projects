@@ -68,6 +68,8 @@ Currently I am running a 4GB version of PI 4b, but a 8gb version has been releas
 If you are running a 4gb version I recommend, detaching monitor output + keyboard + mouse and instead ssh in.
 As my pi would freeze up otherwise when running druid. I would not recommend running druid on the 4gb pi. 
 
+NOTE: make sure your pi is well cooled, a good fan/good heat sink. Druid is a big ask from a pi.
+
 Instead ssh into your pi:
 
 Note 'pi' here is the username/account your going to login with, you can also omit it from ssh.
