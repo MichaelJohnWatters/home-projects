@@ -1,3 +1,7 @@
+add - pip install flask-restful
+
+
+
 # home-projects
 
 Requirements
