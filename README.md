@@ -2,7 +2,7 @@
 
 Requirements
 Hardware 
-- rasberry pi 4B
+- rasberry pi 4B 4GB version
 - 2x DHT22 sensors
 - wire (optional)
 - soldering iron (optional)
@@ -16,22 +16,21 @@ boot os 2020-05-27-raspios-buster-arm64.img
 Use rasberry pi imager to load os on to your ssd.
 - https://www.raspberrypi.org/downloads/ 
 
-insert sd card
+- insert sd card
 
-attach sensors, by default the app uses pin 4 and pin 22 for data between sensor and pi.
+- attach sensors, by default the app uses pin 4 and pin 22 for data between sensor and pi.
 
-turn on pi
+- turn on pi
 
 Pi Setup
 
 After normal setup:
-
-sudo apt update
-sudo apt upgrade
+- sudo apt update
+- sudo apt upgrade
 
 Install Docker and docker-compose
-sudo apt install docker
-sudo apt install docker-compose
+- sudo apt install docker
+-sudo apt install docker-compose
 
 Druid
 Needs java 8 for druid, java 8 not realy supported for rasberry pi os 64/deb buster
@@ -39,20 +38,20 @@ This worked for me, however this may change.
 - https://adoptopenjdk.net/installation.html#linux-pkg
 
 Java 8 setup as above:
-sudo wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
+- sudo wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
 
-sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
+- sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
 
-sudo wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
+- sudo wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
 
 Note if you get "command not found", in some cases add-apt-repository command will be missing.
-sudo apt-get install -y software-properties-common
+- sudo apt-get install -y software-properties-common
 
-wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
+- wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
 
-sudo apt-get install adoptopenjdk-8-hotspot
+- sudo apt-get install adoptopenjdk-8-hotspot
 
-java --version
+- java --version
 
 should show
 openjdk version "1.8.0_232"
