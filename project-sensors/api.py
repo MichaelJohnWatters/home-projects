@@ -27,11 +27,11 @@ mock_database = list()
 list_sensor_reads = list()
 
 #Quick call vars - /sensors/now
-last_temperature_1 = 0.0
-last_temperature_2 = 0.0
-last_humdity_1 = 0.0
-last_humdity_2 = 0.0
-last_read_time = datetime.now()
+last_temperature_1
+last_temperature_2
+last_humdity_1
+last_humdity_2
+last_read_time
 
 #Classes
 class SensorNow(Resource):
@@ -129,6 +129,11 @@ api.add_resource(SensorNow,'/sensors/now')
 if __name__ == '__main__':
     sensorsThread = threading.Thread(target=sensorsThread, args=())
     apiThread = threading.Thread(target=apiThread, args=())
+
     sensorsThread.start
     apiThread.start
+
+    sensorsThread.join  
+    apiThread.join
+    
 
