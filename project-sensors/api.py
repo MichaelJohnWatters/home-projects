@@ -116,7 +116,7 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
         #print(threadName + " last_temperature_2 var:" + str(last_temperature_2))
         #print(threadName + " last_read_time var:" + str(last_read_time))
         #print(threadName + " list_sensor_reads var:" + str(len(list_sensor_reads)))
-        print("reads: " + len(list_sensor_reads.append))
+        #print("reads: " + len(list_sensor_reads.append))
 
         #sleep for abit
         time.sleep(readDelay)
