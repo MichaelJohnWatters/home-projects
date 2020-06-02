@@ -6,6 +6,7 @@ from flask import Flask
 from flask_restful import Resource, Api
 import Adafruit_DHT
 import json
+from json import JSONEncoder
 
 #Adafruit config
 sensor_type = Adafruit_DHT.DHT22
@@ -64,13 +65,15 @@ class SensorAll(Resource):
     def get(self):
         global list_sensor_reads
         responseObj = SensorValue(10.00, 99.00)
-        return json.dumps(responseObj)
+        return responseObj.toJSON()
 
 #Class
 class SensorValue:
-  def __init__(self, temperature, humdity):
-    self.temperature = temperature
-    self.humdity = humdity
+    def __init__(self, temperature, humdity):
+        self.temperature = temperature
+        self.humdity = humdity
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 #Threading class
 class ApiThread(threading.Thread):
