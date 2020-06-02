@@ -63,7 +63,7 @@ class SensorNow(Resource):
 class SensorAll(Resource):
     def get(self):
         global list_sensor_reads
-        responseObj = list_sensor_reads.copy()
+        responseObj = SensorValue(10.00, 99.00)
         return json.dumps(responseObj)
 
 #Class
@@ -129,14 +129,14 @@ def readSensors(sensor_type, sensor_pin_1, sensor_pin_2, bool_sensor_retry):
     # use logging instead later
     if sensor_retry == True:
         print("sensor - reading - sensor_pin_1 ...")
-        temperature1, humidity1 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_1)
+        humidity1, temperature1 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_1)
         print("sensor - reading - sensor_pin_2 ...")
-        temperature2, humidity2 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_2)
+        humidity2, temperature2 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_2)
         print("sensor - reading - finished ...")
         return (SensorValue(temperature1,humidity1), SensorValue(temperature1,humidity2), datetime.now()) 
     else:
-        temperature1, humidity1 = Adafruit_DHT.read(sensor_type, sensor_pin_1)
-        temperature2, humidity2 = Adafruit_DHT.read(sensor_type, sensor_pin_2)
+        humidity1, temperature1 = Adafruit_DHT.read(sensor_type, sensor_pin_1)
+        humidity2, temperature2 = Adafruit_DHT.read(sensor_type, sensor_pin_2)
         if humidity1 is not None and temperature1 is not None and humidity2 is not None and temperature2 is not None:
             return (SensorValue(temperature1,humidity1), SensorValue(temperature1,humidity2), datetime.now())
         else:
