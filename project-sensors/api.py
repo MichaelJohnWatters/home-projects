@@ -1,46 +1,50 @@
-from flask import Flask
-from flask_restful import Resource, Api
-import Adafruit_DHT
 import time
 import logging
 import threading
 from datetime import datetime
+from flask import Flask
+from flask_restful import Resource, Api
+import Adafruit_DHT
 
-# TODO instead of trying to read sensor values on request
-# create 2 threads one for the api and one for the sensors.
-# Continuosuly record sensor values.
-# return the most recent value.
-# will eventualy post to druid db.
-
-## Config will have config file
-DHT_SENSOR = Adafruit_DHT.DHT22
-DHT_PIN_4 = 4
-DHT_PIN_22 = 22
+#Adafruit config
+sensor_type = Adafruit_DHT.DHT22
+sensor_pin_1 = 4
+sensor_pin_2 = 22
 sensor_thread_running= True
 sensor_retry = True
 sensor_group_size = 2
 
-#mock db will be druid
-mock_database = list()
+#General config
+grouped_read_size = 10
+sensor_read_delay = 5
 
-#grouped reads
-list_sensor_reads = list()
+#Running flags
+api_running_flag = True
+sensor_running_flag = True
 
-#Quick call vars - /sensors/now
-last_temperature_1 = 0.8
+#Most recent sensor read values
+last_temperature_1 = 0.0
 last_temperature_2 = 0.0
 last_humdity_1 = 0.0
 last_humdity_2 = 0.0
 last_read_time = 0.0
 
-#Classes
+#grouped reads
+list_sensor_reads = list()
+
+#Mock database
+mock_database = list()
+
+#Class
 class SensorNow(Resource):
     def get(self):
+
         global last_temperature_1
         global last_temperature_2
         global last_humdity_1
         global last_humdity_2
         global last_read_time
+
         return {
             'sensor1':{
                 "temperature":last_temperature_1,
@@ -53,103 +57,85 @@ class SensorNow(Resource):
                 "timestamp":str(last_read_time)
             }
         }
-
+#Class
 class SensorValue:
   def __init__(self, temperature, humdity):
     self.temperature = temperature
     self.humdity = humdity
 
-class api(threading.Thread):
-    def __init__ (self):
+#Threading class
+class ApiThread(threading.Thread):
+    def __init__ (self, name):
         threading.Thread.__init__(self)
+        self.name = name
     def run(self):
-        print("Running api thread.")
+        print(f"Running : {self.name} thread.")
+        app = Flask(__name__)
+        api = Api(app)
+        api.add_resource(SensorNow,'/sensors/now')
         app.run(host='0.0.0.0', port=80,debug=False)
-        print("Stopping api thread.")
+        print(f"Stopping :{self.name} thread.")
 
-class sensorRun(threading.Thread):
-    def __init__ (self):
+#Threading class
+class SensorThread (threading.Thread):
+    def __init__(self, name, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry):
         threading.Thread.__init__(self)
+        self.name        = name
+        self.runningFlag = runningFlag
+        self.readDelay   = readDelay
+        self.sensortype  = sensortype
+        self.pin1        = pin1
+        self.pin2        = pin2
+        self.sensorRetry = sensorRetry
     def run(self):
-        print("Running Sensors thread.")
+        print(f"Running : {self.name} thread.")
+        read(self.name, self.runningFlag, self.readDelay, self.sensortype, self.pin1, self.pin2, self.sensorRetry)
+        print(f"Stopping :{self.name} thread.")
+
+def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry):
+    while runningFlag:
+
+        global list_sensor_reads
         global last_temperature_1
         global last_temperature_2
         global last_humdity_1
         global last_humdity_2
         global last_read_time
 
-        while sensor_thread_running == True:
-            # check current group size, if too large send to db and reset group.
-            if(len(list_sensor_reads) > sensor_group_size):
-                #TODO send list of reads to druid + confirm injestion.
-                mock_database.append(list_sensor_reads)
-                #clear list of reads
-                list_sensor_reads = list()
+        readings = readSensors(sensortype, pin1, pin2, sensorRetry)
 
-            # read sensors
-            sensorValues = readSensors(Adafruit_DHT.DHT22, True,22,4)
-            global last_temperature_1
-            global last_temperature_2
-            global last_humdity_1
-            global last_humdity_2
-            global last_read_time
+        list_sensor_reads.append(readings)
+        last_temperature_1 = readings[1].temperature
+        last_temperature_2 = readings[2].temperature
+        last_humdity_1     = readings[1].humdity
+        last_humdity_2     = readings[2].humdity
+        last_read_time     = readings[3]
 
-            #update quick calls
-            last_temperature_1 = sensorValues[0].temperature
-            last_temperature_2 = sensorValues[1].temperature
-            last_humdity_1 = sensorValues[0].humdity
-            last_humdity_2 = sensorValues[1].humdity
-            last_read_time = sensorValues[2]
+        print(threadName + " list_sensor_reads var:" + str(list_sensor_reads))
+        print(threadName + " last_temperature_1 var:" + str(last_temperature_1))
+        print(threadName + " last_temperature_2 var:" + str(last_temperature_2))
+        print(threadName + " last_read_time var:" + str(last_read_time))
+        print(threadName + " list_sensor_reads var:" + str(len(list_sensor_reads)))
 
-            #append to read grouping
-            list_sensor_reads.append(sensorValues)
+        #sleep for abit
+        time.sleep(readDelay)
 
-            print(mock_database)
-            print(list_sensor_reads)
-            print(last_temperature_1)
-            time.sleep(3)
-        
-        print("Stopping Sensors thread.")
-
-#returns tuple3 (SensorValue, SensorValue, datetime)        
-def readSensors(sensor_type, bool_sensor_retry, sensor1, sensor2):
-    if bool_sensor_retry ==True:
-        humidity1, temperature1 = Adafruit_DHT.read_retry(sensor_type, sensor1)
-        humidity2, temperature2 = Adafruit_DHT.read_retry(sensor_type, sensor2)
-        if humidity1 is not None and temperature1 is not None and humidity2 is not None and temperature2 is not None :
+def readSensors(sensor_type, sensor_pin_1, sensor_pin_2, bool_sensor_retry):
+    # sometimes reads occur when sensor does not have a value to return, rety makes sure a value gets returned.
+    if sensor_retry == True:
+        humidity1, temperature1 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_1)
+        humidity2, temperature2 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_2)
+        return (SensorValue(humidity1,temperature1), SensorValue(humidity2,temperature2), datetime.now()) 
+    else:
+        humidity1, temperature1 = Adafruit_DHT.read(sensor_type, sensor_pin_1)
+        humidity2, temperature2 = Adafruit_DHT.read(sensor_type, sensor_pin_2)
+        if humidity1 is not None and temperature1 is not None and humidity2 is not None and temperature2 is not None:
             return (SensorValue(humidity1,temperature1), SensorValue(humidity2,temperature2), datetime.now())
         else:
-            #log message in future
-            raise Exception("Sensor failure: timing issues or check wires.")
-    else:
-        humidity1, temperature1 = Adafruit_DHT.read_retry(sensor_type, sensor1)
-        humidity2, temperature2 = Adafruit_DHT.read_retry(sensor_type, sensor2)
-        return (SensorValue(humidity1,temperature1), SensorValue(humidity2,temperature2), datetime.now())
+            raise Exception("retry off, not all reads succedded")
 
-#def readSensor(sensor_type, sensor_pin, bool_sensor_retry):
-#    if bool_sensor_retry == True:
-#        humidity, temperature = Adafruit_DHT.read_retry(sensor_type, sensor_pin)
-#        return "Temp={0:0.1f}C Humidity={1:0.1f}%".format(temperature, humidity)
-#    else:
-#        humidity, temperature = Adafruit_DHT.read(sensor_type, sensor_pin)
-#        if humidity is not None and temperature is not None:
-#            return "Temp={0:0.1f}C Humidity={1:0.1f}%".format(temperature, humidity)
-#        else:
-#            return "Sensor failure: timing issues or check wires."
+# Start new Threads
+SensorThread("Sensors", sensor_running_flag, sensor_read_delay, sensor_type, sensor_pin_1, sensor_pin_2, sensor_retry).start()
+ApiThread("Api").start()
 
-app = Flask(__name__)
-api = Api(app)
-
-api.add_resource(SensorNow,'/sensors/now')
-
-# create threads in here
-# https://realpython.com/intro-to-python-threading/
-if __name__ == '__main__':
-    print("begin")
-
-    thread1 = sensorRun()
-    #thread2 = api()
-
-    thread1.start()
-    #thread2.start()
-    print("end")
+print ("Exiting Main Thread")
