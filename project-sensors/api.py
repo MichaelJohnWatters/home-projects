@@ -5,6 +5,7 @@ from datetime import datetime
 from flask import Flask
 from flask_restful import Resource, Api
 import Adafruit_DHT
+import json
 
 #Adafruit config
 sensor_type = Adafruit_DHT.DHT22
@@ -35,7 +36,7 @@ list_sensor_reads = list()
 #Mock database
 mock_database = list()
 
-#Class
+#Endpoint Class
 class SensorNow(Resource):
     def get(self):
 
@@ -57,6 +58,14 @@ class SensorNow(Resource):
                 "timestamp":str(last_read_time)
             }
         }
+
+#Endpoint Class
+class SensorAll(Resource):
+    def get(self):
+        global list_sensor_reads
+        responseObj = list_sensor_reads.copy()
+        return json.dumps(responseObj)
+
 #Class
 class SensorValue:
   def __init__(self, temperature, humdity):
@@ -73,6 +82,7 @@ class ApiThread(threading.Thread):
         app = Flask(__name__)
         api = Api(app)
         api.add_resource(SensorNow,'/sensors/now')
+        api.add_resource(SensorAll,'/sensors/all')
         app.run(host='0.0.0.0', port=80,debug=False)
         print(f"Stopping :{self.name} thread.")
 
@@ -111,27 +121,24 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
         last_humdity_2     = readings[1].humdity
         last_read_time     = readings[2]
 
-        #print(threadName + " list_sensor_reads var:" + str(list_sensor_reads))
-        #print(threadName + " last_temperature_1 var:" + str(last_temperature_1))
-        #print(threadName + " last_temperature_2 var:" + str(last_temperature_2))
-        #print(threadName + " last_read_time var:" + str(last_read_time))
-        #print(threadName + " list_sensor_reads var:" + str(len(list_sensor_reads)))
-        #print("reads: " + len(list_sensor_reads.append))
-
         #sleep for abit
         time.sleep(readDelay)
 
 def readSensors(sensor_type, sensor_pin_1, sensor_pin_2, bool_sensor_retry):
     # sometimes reads occur when sensor does not have a value to return, rety makes sure a value gets returned.
+    # use logging instead later
     if sensor_retry == True:
-        humidity1, temperature1 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_1)
-        humidity2, temperature2 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_2)
-        return (SensorValue(humidity1,temperature1), SensorValue(humidity2,temperature2), datetime.now()) 
+        print("sensor - reading - sensor_pin_1 ...")
+        temperature1, humidity1 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_1)
+        print("sensor - reading - sensor_pin_2 ...")
+        temperature2, humidity2 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_2)
+        print("sensor - reading - finished ...")
+        return (SensorValue(temperature1,humidity1), SensorValue(temperature1,humidity2), datetime.now()) 
     else:
-        humidity1, temperature1 = Adafruit_DHT.read(sensor_type, sensor_pin_1)
-        humidity2, temperature2 = Adafruit_DHT.read(sensor_type, sensor_pin_2)
+        temperature1, humidity1 = Adafruit_DHT.read(sensor_type, sensor_pin_1)
+        temperature2, humidity2 = Adafruit_DHT.read(sensor_type, sensor_pin_2)
         if humidity1 is not None and temperature1 is not None and humidity2 is not None and temperature2 is not None:
-            return (SensorValue(humidity1,temperature1), SensorValue(humidity2,temperature2), datetime.now())
+            return (SensorValue(temperature1,humidity1), SensorValue(temperature1,humidity2), datetime.now())
         else:
             raise Exception("retry off, not all reads succedded")
 
