@@ -36,6 +36,11 @@ last_read_time
 #Classes
 class SensorNow(Resource):
     def get(self):
+        global last_temperature_1
+        global last_temperature_2
+        global last_humdity_1
+        global last_humdity_2
+        global last_read_time
         return {
             'sensor1':{
                 "temperature":last_temperature_1,
@@ -61,30 +66,29 @@ def apiThread():
 
 # Thread - Side affect function
 def sensorsThread(sensor_type, bool_sensor_retry, sensor_dht_pin_one, sensor_dht_pin_two):
+    global last_temperature_1
+    global last_temperature_2
+    global last_humdity_1
+    global last_humdity_2
+    global last_read_time
     
     while sensor_thread_running == True:
-
         # check current group size, if too large send to db and reset group.
         if(len(list_sensor_reads) > sensor_group_size):
             #TODO send list of reads to druid + confirm injestion.
-            #clear list of reads
             mock_database.append(list_sensor_reads)
+            #clear list of reads
             list_sensor_reads = list()
 
         # read sensors
         sensorValues = readSensors(sensor_type,bool_sensor_retry,sensor_dht_pin_one,sensor_dht_pin_two)
         
         #update quick calls
-        global last_temperature_1
-        global last_temperature_2
-        global last_humdity_1
-        global last_humdity_2
-        global last_read_time
         last_temperature_1 = sensorValues[0].temperature
         last_temperature_2 = sensorValues[1].temperature
-        last_humdity_1     = sensorValues[0].humdity
-        last_humdity_2     = sensorValues[1].humdity
-        last_read_time     = sensorValues[2]
+        last_humdity_1 = sensorValues[0].humdity
+        last_humdity_2 = sensorValues[1].humdity
+        last_read_time = sensorValues[2]
 
         #append to read grouping
         list_sensor_reads.append(sensorValues)
@@ -122,7 +126,6 @@ app = Flask(__name__)
 api = Api(app)
 
 api.add_resource(SensorNow,'/sensors/now')
-#api.add_resource(SensorAll,'/sensors/all')
 
 # create threads in here
 # https://realpython.com/intro-to-python-threading/
@@ -133,7 +136,5 @@ if __name__ == '__main__':
     sensorsThread.start
     apiThread.start
 
-    sensorsThread.join  
-    apiThread.join
     
 
