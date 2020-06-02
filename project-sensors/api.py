@@ -105,17 +105,18 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
         readings = readSensors(sensortype, pin1, pin2, sensorRetry)
 
         list_sensor_reads.append(readings)
-        last_temperature_1 = readings[1].temperature
-        last_temperature_2 = readings[2].temperature
-        last_humdity_1     = readings[1].humdity
-        last_humdity_2     = readings[2].humdity
-        last_read_time     = readings[3]
+        last_temperature_1 = readings[0].temperature
+        last_temperature_2 = readings[1].temperature
+        last_humdity_1     = readings[0].humdity
+        last_humdity_2     = readings[1].humdity
+        last_read_time     = readings[2]
 
-        print(threadName + " list_sensor_reads var:" + str(list_sensor_reads))
-        print(threadName + " last_temperature_1 var:" + str(last_temperature_1))
-        print(threadName + " last_temperature_2 var:" + str(last_temperature_2))
-        print(threadName + " last_read_time var:" + str(last_read_time))
-        print(threadName + " list_sensor_reads var:" + str(len(list_sensor_reads)))
+        #print(threadName + " list_sensor_reads var:" + str(list_sensor_reads))
+        #print(threadName + " last_temperature_1 var:" + str(last_temperature_1))
+        #print(threadName + " last_temperature_2 var:" + str(last_temperature_2))
+        #print(threadName + " last_read_time var:" + str(last_read_time))
+        #print(threadName + " list_sensor_reads var:" + str(len(list_sensor_reads)))
+        print("reads: " + len(list_sensor_reads.append))
 
         #sleep for abit
         time.sleep(readDelay)
