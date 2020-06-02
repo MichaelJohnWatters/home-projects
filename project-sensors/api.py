@@ -59,42 +59,57 @@ class SensorValue:
     self.temperature = temperature
     self.humdity = humdity
 
-# Thread -side affect function
-# add config
-def apiThread():
-    app.run(host='0.0.0.0', port=80,debug=False)
+class api(threading.Thread):
+    def __init__ (self):
+        threading.Thread.__init__(self)
+    def run(self):
+        print("Running api thread.")
+        app.run(host='0.0.0.0', port=80,debug=False)
+        print("Stopping api thread.")
 
-# Thread - Side affect function
-def sensorsThread(sensor_type, bool_sensor_retry, sensor_dht_pin_one, sensor_dht_pin_two):
-    global last_temperature_1
-    global last_temperature_2
-    global last_humdity_1
-    global last_humdity_2
-    global last_read_time
-    
-    while sensor_thread_running == True:
-        # check current group size, if too large send to db and reset group.
-        if(len(list_sensor_reads) > sensor_group_size):
-            #TODO send list of reads to druid + confirm injestion.
-            mock_database.append(list_sensor_reads)
-            #clear list of reads
-            list_sensor_reads = list()
+class sensorRun(threading.Thread):
+    def __init__ (self):
+        threading.Thread.__init__(self)
+    def run(self):
+        print("Running Sensors thread.")
+        global last_temperature_1
+        global last_temperature_2
+        global last_humdity_1
+        global last_humdity_2
+        global last_read_time
 
-        # read sensors
-        sensorValues = readSensors(sensor_type,bool_sensor_retry,sensor_dht_pin_one,sensor_dht_pin_two)
+        while sensor_thread_running == True:
+            # check current group size, if too large send to db and reset group.
+            if(len(list_sensor_reads) > sensor_group_size):
+                #TODO send list of reads to druid + confirm injestion.
+                mock_database.append(list_sensor_reads)
+                #clear list of reads
+                list_sensor_reads = list()
+
+            # read sensors
+            sensorValues = readSensors(Adafruit_DHT.DHT22, True,22,4)
+            global last_temperature_1
+            global last_temperature_2
+            global last_humdity_1
+            global last_humdity_2
+            global last_read_time
+
+            #update quick calls
+            last_temperature_1 = sensorValues[0].temperature
+            last_temperature_2 = sensorValues[1].temperature
+            last_humdity_1 = sensorValues[0].humdity
+            last_humdity_2 = sensorValues[1].humdity
+            last_read_time = sensorValues[2]
+
+            #append to read grouping
+            list_sensor_reads.append(sensorValues)
+
+            print(mock_database)
+            print(list_sensor_reads)
+            print(last_temperature_1)
+            time.sleep(3)
         
-        #update quick calls
-        last_temperature_1 = sensorValues[0].temperature
-        last_temperature_2 = sensorValues[1].temperature
-        last_humdity_1 = sensorValues[0].humdity
-        last_humdity_2 = sensorValues[1].humdity
-        last_read_time = sensorValues[2]
-
-        #append to read grouping
-        list_sensor_reads.append(sensorValues)
-
-        #sleep thread
-        time.sleep(3)
+        print("Stopping Sensors thread.")
 
 #returns tuple3 (SensorValue, SensorValue, datetime)        
 def readSensors(sensor_type, bool_sensor_retry, sensor1, sensor2):
@@ -130,11 +145,11 @@ api.add_resource(SensorNow,'/sensors/now')
 # create threads in here
 # https://realpython.com/intro-to-python-threading/
 if __name__ == '__main__':
-    a = threading.Thread(target=sensorsThread, args=())
-    b = threading.Thread(target=apiThread, args=())
+    print("begin")
 
-    a.start
-    b.start
+    thread1 = sensorRun()
+    #thread2 = api()
 
-    
-
+    thread1.start()
+    #thread2.start()
+    print("end")
