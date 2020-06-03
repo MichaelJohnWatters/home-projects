@@ -18,7 +18,7 @@ sensor_retry = True
 sensor_group_size = 2
 
 #General config
-sensor_grouping_size = 10
+sensor_grouping_size = 3
 sensor_read_delay = 5
 host = '0.0.0.0'
 port = 80
@@ -145,12 +145,9 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
         #if max group size reached, put in mock db + reset group.
         if len(list_sensor_reads) >= sensor_grouping_size:
             for read in list_sensor_reads:
-                print (f"added: {len(list_sensor_reads)} SensorValues to mock_database")
                 mock_database.append(read)
-
-        print("Current Mock database: ")
-        for sensorsValues in mock_database:
-            print(sensorsValues)
+        
+        print(f"Current Mock database: {len(mock_database)}")
         list_sensor_reads = list()
         #sleep for abit
         time.sleep(readDelay)
