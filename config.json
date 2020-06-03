@@ -1,0 +1,23 @@
+{
+    "druid": {
+
+    },
+    "go-api": {
+        "host": "0.0.0.0",
+        "port-out": "5000",
+        "port-docker": "80"
+
+    },
+    "sensors": {
+        "host": "0.0.0.0",
+        "port-out": "5001",
+        "port-docker": "80"
+
+    },
+    "website": {
+        "host": "0.0.0.0",
+        "port-out": "5002",
+        "port-docker": "80"
+
+    }
+}
