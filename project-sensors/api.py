@@ -96,7 +96,7 @@ class ApiThread(threading.Thread):
         api.add_resource(SensorNow,'/sensors/now')
         api.add_resource(SensorAll,'/sensors/all')
 
-        app.run(host='0.0.0.0', port=80,debug=False)
+        app.run(host=self.host, port=self.port,debug=self.debug)
 
         print(f"Stopping :{self.name} thread.")
 
