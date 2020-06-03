@@ -146,9 +146,9 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
             for read in list_sensor_reads:
                 global mock_database
                 mock_database.append(read)
+                list_sensor_reads = list()
         
         print(f"Current Mock database: {len(mock_database)}")
-        list_sensor_reads = list()
         #sleep for abit
         time.sleep(readDelay)
 
