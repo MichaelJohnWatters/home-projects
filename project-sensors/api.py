@@ -23,6 +23,8 @@ sensor_read_delay = 5
 host = '0.0.0.0'
 port = 80
 debug = False
+
+#Running flags
 api_running_flag = True
 sensor_running_flag = True
 
@@ -94,9 +96,9 @@ class ApiThread(threading.Thread):
         api.add_resource(SensorNow,'/sensors/now')
         api.add_resource(SensorAll,'/sensors/all')
 
-        app.run(host=self.host, port=self.port, debug=self.debug)
+        app.run(host=self.host, port=self.port,debug=self.debug)
 
-        print(f"Stopping : {self.name} thread.")
+        print(f"Stopping :{self.name} thread.")
 
 #Threading class
 class SensorThread (threading.Thread):
@@ -112,10 +114,10 @@ class SensorThread (threading.Thread):
 
     def run(self):
         print(f"Running : {self.name} thread.")
-        readSensors(self.name, self.runningFlag, self.readDelay, self.sensortype, self.pin1, self.pin2, self.sensorRetry)
-        print(f"Stopping : {self.name} thread.")
+        read(self.name, self.runningFlag, self.readDelay, self.sensortype, self.pin1, self.pin2, self.sensorRetry)
+        print(f"Stopping :{self.name} thread.")
 
-def readSensors(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry):
+def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry):
     while runningFlag:
 
         global list_sensor_reads
@@ -144,6 +146,7 @@ def readSensors(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sens
         if len(list_sensor_reads) >= sensor_grouping_size:
             mock_database.append(list_sensor_reads)
             list_sensor_reads = list()
+            print(mock_database)
 
         #sleep for abit
         time.sleep(readDelay)
