@@ -144,10 +144,14 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
 
         #if max group size reached, put in mock db + reset group.
         if len(list_sensor_reads) >= sensor_grouping_size:
-            mock_database.append(list_sensor_reads)
-            list_sensor_reads = list()
-            print(mock_database)
+            for read in list_sensor_reads:
+                print (f"added: {len(list_sensor_reads)} SensorValues to mock_database")
+                mock_database.append(read)
 
+        print("Current Mock database: ")
+        for sensorsValues in mock_database:
+            print(sensorsValues)
+        list_sensor_reads = list()
         #sleep for abit
         time.sleep(readDelay)
 
