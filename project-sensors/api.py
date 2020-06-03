@@ -120,7 +120,6 @@ class SensorThread (threading.Thread):
 def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry):
     while runningFlag:
 
-        global list_sensor_reads
         global last_temperature_1
         global last_temperature_2
         global last_humdity_1
@@ -145,6 +144,7 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
         #if max group size reached, put in mock db + reset group.
         if len(list_sensor_reads) >= sensor_grouping_size:
             for read in list_sensor_reads:
+                global mock_database
                 mock_database.append(read)
         
         print(f"Current Mock database: {len(mock_database)}")
