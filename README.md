@@ -1,3 +1,10 @@
+TO RUN
+
+chmod a+x ./run.sh
+./run.sh
+
+
+
 add - pip install flask-restful
 add pip3 install flask-restful
 

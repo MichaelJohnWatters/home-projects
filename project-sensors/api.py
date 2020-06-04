@@ -175,4 +175,4 @@ def readSensors(sensor_type, sensor_pin_1, sensor_pin_2, bool_sensor_retry):
 SensorThread("Sensors", sensor_running_flag, sensor_read_delay, sensor_type, sensor_pin_1, sensor_pin_2, sensor_retry).start()
 ApiThread("Api",host, port, debug).start()
 
-print ("Exiting Main Thread")
+print ("api.py ... Exiting Main Thread")
