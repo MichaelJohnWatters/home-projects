@@ -1,6 +1,7 @@
 TO RUN
 
 chmod a+x ./run.sh
+chmod a+x ./run druid.sh
 ./run.sh
 
 
