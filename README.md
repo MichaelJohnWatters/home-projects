@@ -5,6 +5,9 @@ chmod a+x ./run druid.sh
 ./run.sh
 
 
+remote development
+https://medium.com/@pythonpow/remote-development-on-a-raspberry-pi-with-ssh-and-vscode-a23388e24bc7
+
 
 add - pip install flask-restful
 add pip3 install flask-restful
