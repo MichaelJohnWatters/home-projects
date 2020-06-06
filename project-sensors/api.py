@@ -1,46 +1,40 @@
 import time
 import logging
 import threading
+import Adafruit_DHT
+import json
+import requests
 from datetime import datetime  
 from datetime import timedelta  
 from flask import Flask
 from flask_restful import Resource, Api
-import Adafruit_DHT
-import json
-import requests
 
 #Get Config
-with open('../config.json') as config:
-    data = json.load(config)
+with open('../config.json') as config_file:
+    config = json.load(config_file)
 
-print(data)
+#sensor config
+sensor_type           = Adafruit_DHT.DHT22
+sensor_pin_4_inside   = config['sensors']['sensor_pin_4_inside']
+sensor_pin_22_outside = config['sensors']['sensor_pin_22_outside']
+sensor_thread_running = config['sensors']['sensor_thread_running']
+sensor_retry          = config['sensors']['sensor_retry']
+sensor_grouping_size  = config['sensors']['sensor_grouping_size']
+sensor_read_delay     = config['sensors']['sensor_read_delay']
+sensor_running_flag   = config['sensors']['sensor_running_flag']
 
-#Adafruit config
-#TODO add config file
-sensor_type = Adafruit_DHT.DHT22
-sensor_pin_4_inside = 4
-sensor_pin_22_outside = 22
-sensor_thread_running = True
-sensor_retry = True
-sensor_group_size = 2
-
-#General config
-sensor_grouping_size = 3
-sensor_read_delay = 3
-host = '0.0.0.0'
-port = 80
-debug = False
-
-#Running flags
-api_running_flag = True
-sensor_running_flag = True
+#api config
+host                  = config['sensors']['host']
+port                  = config['sensors']['port']
+debug                 = config['sensors']['debug']
+api_running_flag      = config['sensors']['api_running_flag']
 
 #Most recent sensor read values
-last_temperature_1 = 0.0
-last_temperature_2 = 0.0
-last_humdity_1 = 0.0
-last_humdity_2 = 0.0
-last_read_time = 0.0
+last_temperature_inside  = 0.0
+last_temperature_outside = 0.0
+last_humdity_inside      = 0.0
+last_humdity_outside     = 0.0
+last_read_datetime       = 0.0
 
 #grouped reads
 list_sensor_reads = list()
@@ -52,24 +46,24 @@ mock_database = list()
 class SensorNow(Resource):
     def get(self):
 
-        global last_temperature_1
-        global last_temperature_2
-        global last_humdity_1
-        global last_humdity_2
-        global last_read_time
+        global last_temperature_inside
+        global last_temperature_outside
+        global last_humdity_inside
+        global last_humdity_outside
+        global last_read_datetime
 
         return {
-            'sensor_pin_4_inside':{
-                "temperature":last_temperature_1,
-                "humidity":last_humdity_1,
-                "timestamp":str(last_read_time)
-            },
-            'sensor_pin_22_outside':{
-                "temperature":last_temperature_2,
-                "humidity":last_humdity_2,
-                "timestamp":str(last_read_time)
+            str(last_read_datetime):{
+                    'sensor_inside':{
+                        "temperature": last_temperature_inside,
+                        "humidity"   : last_humdity_inside
+                    },
+                    'sensor_outside':{
+                        "temperature": last_temperature_outside,
+                        "humidity"   : last_humdity_outside
+                    }
+                }
             }
-        }
 
 #Class
 class SensorValue:
@@ -86,21 +80,16 @@ class SensorAll(Resource):
         
         arrayOfReadsAsJson = []
 
+        # (SensorValue(???,???),SensorValue(???,???), datetime)
         for tuple3 in listOfReads:
-            insideT =  tuple3[0].temperature
-            insideH =  tuple3[0].humdity
-            outsideT =  tuple3[1].temperature
-            outsideH =  tuple3[1].humdity
-            date =  tuple3[2]
-
-            myjson = {f"{date}":{
+            myjson = {f"{tuple3[2]}":{
                     'sensor_inside':{
-                    "temperature":insideT,
-                    "humidity":insideH
+                        "temperature": tuple3[0].temperature,
+                        "humidity"   : tuple3[0].humdity
                     },
                     'sensor_outside':{
-                    "temperature":outsideT,
-                    "humidity":outsideH
+                        "temperature": tuple3[1].temperature,
+                        "humidity"   : tuple3[1].humdity
                     }
                 }
             }
@@ -151,11 +140,12 @@ class SensorThread (threading.Thread):
 def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry):
     while runningFlag:
 
-        global last_temperature_1
-        global last_temperature_2
-        global last_humdity_1
-        global last_humdity_2
-        global last_read_time
+        global last_temperature_inside
+        global last_temperature_outside
+        global last_humdity_inside
+        global last_humdity_outside
+
+        global last_read_datetime
         global sensor_grouping_size
         global list_sensor_reads
         global mock_database
@@ -163,11 +153,11 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
         readings = readSensors(sensortype, pin1, pin2, sensorRetry)
 
         #set lastest read values
-        last_temperature_1 = readings[0].temperature
-        last_temperature_2 = readings[1].temperature
-        last_humdity_1     = readings[0].humdity
-        last_humdity_2     = readings[1].humdity
-        last_read_time     = readings[2]
+        last_temperature_inside = readings[0].temperature
+        last_temperature_outside = readings[1].temperature
+        last_humdity_inside = readings[0].humdity
+        last_humdity_outside = readings[1].humdity
+        last_read_datetime = readings[2]
 
         #stick into list of sensor reads
         list_sensor_reads.append(readings)
@@ -185,9 +175,8 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
         time.sleep(readDelay)
 
 def readSensors(sensor_type, sensor_pin_4_inside, sensor_pin_22_outside, bool_sensor_retry):
-    # sometimes reads occur when sensor does not have a value to return, rety makes sure a value gets returned.
-    # use logging instead later
-    # maybe change to not continously retry, if a sensors breaks. maybee try 3-5 times then throw error.
+    # sometimes reads occur when sensor does not have a value to return, retry makes sure a value gets returned.
+    # TODO change to not continously, maybee try 3-5 times then throw error.
     if sensor_retry == True:
         print("sensor - reading - sensor_pin_4_inside...")
         humidity1, temperature1 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_4_inside)
@@ -196,8 +185,7 @@ def readSensors(sensor_type, sensor_pin_4_inside, sensor_pin_22_outside, bool_se
         print("sensor - reading - finished...")
         return (SensorValue(temperature1,humidity1), SensorValue(temperature2,humidity2), datetime.now()) 
     else:
-        humidity1, temperature1 = Adafruit_DHT.read(sensor_type, sensor_pin_4_inside
-    )
+        humidity1, temperature1 = Adafruit_DHT.read(sensor_type, sensor_pin_4_inside)
         humidity2, temperature2 = Adafruit_DHT.read(sensor_type, sensor_pin_22_outside)
         if humidity1 is not None and temperature1 is not None and humidity2 is not None and temperature2 is not None:
             return (SensorValue(temperature1,humidity1), SensorValue(temperature2,humidity2), datetime.now())

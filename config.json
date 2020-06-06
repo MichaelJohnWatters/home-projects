@@ -18,7 +18,6 @@
         "sensor_pin_22_outside" : 22,
         "sensor_thread_running" : true,
         "sensor_retry" : true,
-        "sensor_group_size" : 2,
         "sensor_grouping_size" : 3,
         "sensor_read_delay" : 3,
         
