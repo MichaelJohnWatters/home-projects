@@ -9,9 +9,21 @@
 
     },
     "sensors": {
-        "host": "0.0.0.0",
-        "port-out": "5001",
-        "port-docker": "80"
+        "host" : "0.0.0.0",
+        "port" :80,
+        "debug" : false,
+
+        "sensor_type" : "Adafruit_DHT.DHT22",
+        "sensor_pin_4_inside" : 4,
+        "sensor_pin_22_outside" : 22,
+        "sensor_thread_running" : true,
+        "sensor_retry" : true,
+        "sensor_group_size" : 2,
+        "sensor_grouping_size" : 3,
+        "sensor_read_delay" : 3,
+        
+        "api_running_flag" : true,
+        "sensor_running_flag" : true
 
     },
     "website": {
