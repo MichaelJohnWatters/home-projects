@@ -1,7 +1,6 @@
 import time
 import json
 import logging
-import requests
 import threading
 import sensorConfig
 import Adafruit_DHT
@@ -20,12 +19,15 @@ last_humdity_inside      = 0.0
 last_humdity_outside     = 0.0
 last_read_datetime       = 0.0
 
-#list of grouped reads, to reduce http requests sent to druid.
+#list of grouped reads, to reduce http requests sent to druid by grouping reads.
 list_sensor_reads = list()
 
-#Mock database for druid atm
-mock_database = list()
-
+def writeToFile(content, file_path):
+    f = open("./data/ingest.json", "w")
+    print("druid - data - to - './project-sensors/data/ingest.json' - writing...")
+    f.write(toDruidFormattedJson(list_sensor_reads))
+    f.close()
+    print("druid - data - to - './project-sensors/data/ingest.json' - writing complete...")
 #Endpoint Class
 class SensorNow(Resource):
     def get(self):
@@ -38,11 +40,11 @@ class SensorNow(Resource):
 
         return {
             str(last_read_datetime):{
-                    'sensor_inside':{
+                    'inside':{
                         "temperature": last_temperature_inside,
                         "humidity"   : last_humdity_inside
                     },
-                    'sensor_outside':{
+                    'outside':{
                         "temperature": last_temperature_outside,
                         "humidity"   : last_humdity_outside
                     }
@@ -55,33 +57,38 @@ class SensorValue:
         self.temperature = temperature
         self.humdity = humdity
 
-#Endpoint Class
-class SensorAll(Resource):
-    def get(self):
-
-        global mock_database
-        listOfReads = mock_database
+#TODO this method is shit fix it
+def toDruidFormattedJson(listOfReads):
+    arrayOfReadsAsJson = []
+    jsonString = ""
+    for sensorVal in listOfReads:
         
-        arrayOfReadsAsJson = []
+        timestamp = str(sensorVal[2])
 
-        # (SensorValue(???,???),SensorValue(???,???), datetime)
-        for tuple3 in listOfReads:
-            myjson = {f"{tuple3[2]}":{
-                    'sensor_inside':{
-                        "temperature": tuple3[0].temperature,
-                        "humidity"   : tuple3[0].humdity
-                    },
-                    'sensor_outside':{
-                        "temperature": tuple3[1].temperature,
-                        "humidity"   : tuple3[1].humdity
-                    }
-                }
-            }
+        responseInside = {
+            "timestamp"  :timestamp,
+            "location"   :"inside",
+            "temperature":sensorVal[0].temperature,
+            "humidity"   :sensorVal[0].humdity
+        }
+        responseOutside = {
+            "timestamp"  :timestamp,
+            "location"   :"outside",
+            "temperature":sensorVal[1].temperature,
+            "humidity"   :sensorVal[1].humdity
+        }
 
-            arrayOfReadsAsJson.append(myjson)
+        arrayOfReadsAsJson.append(json.dumps(responseInside))
+        arrayOfReadsAsJson.append(json.dumps(responseOutside))
 
-        return arrayOfReadsAsJson
-        
+    for item in arrayOfReadsAsJson:
+        mystr = str(item)
+        if jsonString == "":
+            jsonString += mystr 
+        else: 
+            jsonString = jsonString + "\n" + mystr
+    return jsonString
+
 #Threading class
 class ApiThread(threading.Thread):
     def __init__ (self, name, host, port, debug):
@@ -91,14 +98,12 @@ class ApiThread(threading.Thread):
         self.port  = port
         self.debug = debug
     def run(self):
-
         print(f"Running : {self.name} thread.")
 
         app = Flask(__name__)
         api = Api(app)
 
         api.add_resource(SensorNow,'/sensors/now')
-        api.add_resource(SensorAll,'/sensors/all')
 
         app.run(host=self.host, port=self.port,debug=self.debug)
 
@@ -117,9 +122,6 @@ class SensorThread (threading.Thread):
         self.sensorRetry  = sensorRetry
         self.groupingSize = groupingSize
 
-        #sensor_thread_running = config.sensor_thread_running
-        #sensor_grouping_size  = config.sensor_grouping_size
-
     def run(self):
         print(f"Running : {self.name} thread.")
         read(self.name, self.runningFlag, self.readDelay, self.sensortype, self.pin1, self.pin2, self.sensorRetry, self.groupingSize)
@@ -133,41 +135,37 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
         global last_humdity_inside
         global last_humdity_outside
         global last_read_datetime
-
         global list_sensor_reads
-        global mock_database
 
         readings = readSensors(sensortype, pin1, pin2, sensorRetry)
 
         #set lastest read values
-        last_temperature_inside = readings[0].temperature
+        last_temperature_inside  = readings[0].temperature
         last_temperature_outside = readings[1].temperature
-        last_humdity_inside = readings[0].humdity
-        last_humdity_outside = readings[1].humdity
-        last_read_datetime = readings[2]
+        last_humdity_inside      = readings[0].humdity
+        last_humdity_outside     = readings[1].humdity
+        last_read_datetime       = readings[2]
 
         #stick into list of sensor reads
         list_sensor_reads.append(readings)
 
-        #if max group size reached, put in mock db + reset group.
+        #if max group size reached, write to file for druid to pick up
         if len(list_sensor_reads) >= groupingSize:
-            for read in list_sensor_reads:
-                print(f"Adding: {read} mock database")
-                global mock_database
-                mock_database.append(read)
-                list_sensor_reads = list()
-        
-        print(f"Current Mock database: {len(mock_database)}")
-        #sleep for abit
+
+            #Write to file for druid to ingest
+            writeToFile(toDruidFormattedJson(list_sensor_reads),"./data/ingest.json")
+
+            #clear the current group
+            list_sensor_reads = list()
+
         time.sleep(readDelay)
 
 def readSensors(sensor_type, sensor_pin_4_inside, sensor_pin_22_outside, bool_sensor_retry):
     # sometimes reads occur when sensor does not have a value to return, retry makes sure a value gets returned.
     # TODO change to not continously, maybee try 3-5 times then throw error.
     if bool_sensor_retry == True:
-        print("sensor - reading - sensor_pin_4_inside...")
+        print("sensor - reading - started...")
         humidity1, temperature1 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_4_inside)
-        print("sensor - reading - sensor_pin_22_outside...")
         humidity2, temperature2 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_22_outside)
         print("sensor - reading - finished...")
         return (SensorValue(temperature1,humidity1), SensorValue(temperature2,humidity2), datetime.now()) 
