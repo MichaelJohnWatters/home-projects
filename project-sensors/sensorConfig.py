@@ -13,7 +13,9 @@ class SensorConfig:
         sensor_grouping_size,
         sensor_read_delay,
         api_running_flag,
-        sensor_running_flag):
+        sensor_running_flag,
+        ingestion_file_path
+        ):
         self.host                  = host
         self.port                  = port
         self.debug                 = debug   
@@ -26,8 +28,9 @@ class SensorConfig:
         self.sensor_read_delay     = sensor_read_delay 
         self.api_running_flag      = api_running_flag 
         self.sensor_running_flag   = sensor_running_flag
+        self.ingestion_file_path   = ingestion_file_path
 
-with open('../config.json') as config_file:
+with open('./config.json') as config_file:
     loadConfig = json.load(config_file)
 
 def sensorType(sensorType):
@@ -50,7 +53,8 @@ config = SensorConfig(
     sensor_grouping_size  = loadConfig['sensors']['sensor_grouping_size'],
     sensor_read_delay     = loadConfig['sensors']['sensor_read_delay'],
     api_running_flag      = loadConfig['sensors']['api_running_flag'],
-    sensor_running_flag   = loadConfig['sensors']['sensor_running_flag']
+    sensor_running_flag   = loadConfig['sensors']['sensor_running_flag'],
+    ingestion_file_path   = loadConfig['sensors']['ingestion_file_path']
 )
 
 

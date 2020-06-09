@@ -1,7 +1,6 @@
 import time
 import json
 import logging
-import requests
 import threading
 import sensorConfig
 import Adafruit_DHT
@@ -20,12 +19,15 @@ last_humdity_inside      = 0.0
 last_humdity_outside     = 0.0
 last_read_datetime       = 0.0
 
-#list of grouped reads, to reduce http requests sent to druid.
+#list of grouped reads, to reduce http requests sent to druid by grouping reads.
 list_sensor_reads = list()
 
-#Mock database for druid atm
-mock_database = list()
-
+def writeToFile(content, file_path):
+    #TODO if file doesnt exist or something
+    f = open("ingest.json", "w")
+    print("writing json for ingestion to file....")
+    f.write(convertToJson(list_sensor_reads))
+    print("finshed writing json for ingestion to file....")
 #Endpoint Class
 class SensorNow(Resource):
     def get(self):
@@ -55,32 +57,29 @@ class SensorValue:
         self.temperature = temperature
         self.humdity = humdity
 
+def convertToJson(listOfReads):
+    arrayOfReadsAsJson = []
+    for sensorVal in listOfReads:
+        response = {f"{sensorVal[2]}":{
+            'sensor_inside':{
+                "temperature": sensorVal[0].temperature,
+                "humidity"    : sensorVal[0].humdity
+            },
+            'sensor_outside':{
+                "temperature": sensorVal[1].temperature,
+                "humidity"   : sensorVal[1].humdity
+            }
+        }
+    }
+        arrayOfReadsAsJson.append(response)
+
+    return json.dumps(arrayOfReadsAsJson)
+
 #Endpoint Class
 class SensorAll(Resource):
     def get(self):
-
-        global mock_database
-        listOfReads = mock_database
-        
-        arrayOfReadsAsJson = []
-
-        # (SensorValue(???,???),SensorValue(???,???), datetime)
-        for tuple3 in listOfReads:
-            myjson = {f"{tuple3[2]}":{
-                    'sensor_inside':{
-                        "temperature": tuple3[0].temperature,
-                        "humidity"   : tuple3[0].humdity
-                    },
-                    'sensor_outside':{
-                        "temperature": tuple3[1].temperature,
-                        "humidity"   : tuple3[1].humdity
-                    }
-                }
-            }
-
-            arrayOfReadsAsJson.append(myjson)
-
-        return arrayOfReadsAsJson
+        f = open("ingest.json", "r")
+        return str(f.read())
         
 #Threading class
 class ApiThread(threading.Thread):
@@ -117,9 +116,6 @@ class SensorThread (threading.Thread):
         self.sensorRetry  = sensorRetry
         self.groupingSize = groupingSize
 
-        #sensor_thread_running = config.sensor_thread_running
-        #sensor_grouping_size  = config.sensor_grouping_size
-
     def run(self):
         print(f"Running : {self.name} thread.")
         read(self.name, self.runningFlag, self.readDelay, self.sensortype, self.pin1, self.pin2, self.sensorRetry, self.groupingSize)
@@ -133,9 +129,7 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
         global last_humdity_inside
         global last_humdity_outside
         global last_read_datetime
-
         global list_sensor_reads
-        global mock_database
 
         readings = readSensors(sensortype, pin1, pin2, sensorRetry)
 
@@ -149,16 +143,15 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
         #stick into list of sensor reads
         list_sensor_reads.append(readings)
 
-        #if max group size reached, put in mock db + reset group.
+        #if max group size reached, write to file for druid to pick up
         if len(list_sensor_reads) >= groupingSize:
-            for read in list_sensor_reads:
-                print(f"Adding: {read} mock database")
-                global mock_database
-                mock_database.append(read)
-                list_sensor_reads = list()
+
+            #Write to file for druid to ingest
+            writeToFile(convertToJson(list_sensor_reads),"ingest.json")
+
+            #clear the current group
+            list_sensor_reads = list()
         
-        print(f"Current Mock database: {len(mock_database)}")
-        #sleep for abit
         time.sleep(readDelay)
 
 def readSensors(sensor_type, sensor_pin_4_inside, sensor_pin_22_outside, bool_sensor_retry):

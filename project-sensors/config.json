@@ -1,18 +1,8 @@
 {
-    "druid": {
-
-    },
-    "go-api": {
-        "host": "0.0.0.0",
-        "port-out": "5000",
-        "port-docker": "80"
-
-    },
     "sensors": {
         "host" : "0.0.0.0",
         "port" :80,
         "debug" : false,
-
         "sensor_type" : "Adafruit_DHT.DHT22",
         "sensor_pin_4_inside" : 4,
         "sensor_pin_22_outside" : 22,
@@ -20,15 +10,8 @@
         "sensor_retry" : true,
         "sensor_grouping_size" : 3,
         "sensor_read_delay" : 3,
-        
         "api_running_flag" : true,
-        "sensor_running_flag" : true
-
-    },
-    "website": {
-        "host": "0.0.0.0",
-        "port-out": "5002",
-        "port-docker": "80"
-
+        "sensor_running_flag" : true,
+        "ingestion_file_path": "ingest.txt"
     }
 }
