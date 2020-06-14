@@ -23,19 +23,11 @@ last_read_datetime       = 0.0
 list_sensor_reads = list()
 
 def writeToFile(content, file_path):
-<<<<<<< HEAD
     f = open("./data/ingest.json", "w")
     print("druid - data - to - './project-sensors/data/ingest.json' - writing...")
     f.write(toDruidFormattedJson(list_sensor_reads))
     f.close()
     print("druid - data - to - './project-sensors/data/ingest.json' - writing complete...")
-=======
-    #TODO if file doesnt exist or something
-    f = open("ingest.json", "w")
-    print("writing json for ingestion to file....")
-    f.write(convertToJson(list_sensor_reads))
-    print("finshed writing json for ingestion to file....")
->>>>>>> df2b901f33933129ca9ac871c6ef798987c769cd
 #Endpoint Class
 class SensorNow(Resource):
     def get(self):
@@ -65,7 +57,6 @@ class SensorValue:
         self.temperature = temperature
         self.humdity = humdity
 
-<<<<<<< HEAD
 #TODO this method is shit fix it
 def toDruidFormattedJson(listOfReads):
     arrayOfReadsAsJson = []
@@ -98,32 +89,6 @@ def toDruidFormattedJson(listOfReads):
             jsonString = jsonString + "\n" + mystr
     return jsonString
 
-=======
-def convertToJson(listOfReads):
-    arrayOfReadsAsJson = []
-    for sensorVal in listOfReads:
-        response = {f"{sensorVal[2]}":{
-            'sensor_inside':{
-                "temperature": sensorVal[0].temperature,
-                "humidity"    : sensorVal[0].humdity
-            },
-            'sensor_outside':{
-                "temperature": sensorVal[1].temperature,
-                "humidity"   : sensorVal[1].humdity
-            }
-        }
-    }
-        arrayOfReadsAsJson.append(response)
-
-    return json.dumps(arrayOfReadsAsJson)
-
-#Endpoint Class
-class SensorAll(Resource):
-    def get(self):
-        f = open("ingest.json", "r")
-        return str(f.read())
-        
->>>>>>> df2b901f33933129ca9ac871c6ef798987c769cd
 #Threading class
 class ApiThread(threading.Thread):
     def __init__ (self, name, host, port, debug):
@@ -188,19 +153,11 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
         if len(list_sensor_reads) >= groupingSize:
 
             #Write to file for druid to ingest
-<<<<<<< HEAD
             writeToFile(toDruidFormattedJson(list_sensor_reads),"./data/ingest.json")
 
             #clear the current group
             list_sensor_reads = list()
 
-=======
-            writeToFile(convertToJson(list_sensor_reads),"ingest.json")
-
-            #clear the current group
-            list_sensor_reads = list()
-        
->>>>>>> df2b901f33933129ca9ac871c6ef798987c769cd
         time.sleep(readDelay)
 
 def readSensors(sensor_type, sensor_pin_4_inside, sensor_pin_22_outside, bool_sensor_retry):
