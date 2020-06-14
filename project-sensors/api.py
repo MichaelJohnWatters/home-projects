@@ -4,6 +4,7 @@ import logging
 import threading
 import sensorConfig
 import Adafruit_DHT
+import sensorLogging
 from   flask         import Flask
 from   flask_restful import Api, Resource
 from   datetime      import datetime  
@@ -24,10 +25,10 @@ list_sensor_reads = list()
 
 def writeToFile(content, file_path):
     f = open("./data/ingest.json", "w")
-    print("druid - data - to - './project-sensors/data/ingest.json' - writing...")
     f.write(toDruidFormattedJson(list_sensor_reads))
+    sensorLogging.logger.info('druid data written to ./project-sensors/data/ingest.json')
     f.close()
-    print("druid - data - to - './project-sensors/data/ingest.json' - writing complete...")
+
 #Endpoint Class
 class SensorNow(Resource):
     def get(self):
@@ -98,16 +99,12 @@ class ApiThread(threading.Thread):
         self.port  = port
         self.debug = debug
     def run(self):
-        print(f"Running : {self.name} thread.")
-
+        sensorLogging.logger.info(f"Running : {self.name} thread.")
         app = Flask(__name__)
         api = Api(app)
-
         api.add_resource(SensorNow,'/sensors/now')
-
         app.run(host=self.host, port=self.port,debug=self.debug)
-
-        print(f"Stopping :{self.name} thread.")
+        sensorLogging.logger.info(f"Stopping :{self.name} thread.")
 
 #Threading class
 class SensorThread (threading.Thread):
@@ -123,9 +120,9 @@ class SensorThread (threading.Thread):
         self.groupingSize = groupingSize
 
     def run(self):
-        print(f"Running : {self.name} thread.")
+        sensorLogging.logger.info(f"Running : {self.name} thread.")
         read(self.name, self.runningFlag, self.readDelay, self.sensortype, self.pin1, self.pin2, self.sensorRetry, self.groupingSize)
-        print(f"Stopping :{self.name} thread.")
+        sensorLogging.logger.info(f"Stopping :{self.name} thread.")
 
 def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry, groupingSize):
     while runningFlag:
@@ -164,10 +161,9 @@ def readSensors(sensor_type, sensor_pin_4_inside, sensor_pin_22_outside, bool_se
     # sometimes reads occur when sensor does not have a value to return, retry makes sure a value gets returned.
     # TODO change to not continously, maybee try 3-5 times then throw error.
     if bool_sensor_retry == True:
-        print("sensor - reading - started...")
         humidity1, temperature1 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_4_inside)
         humidity2, temperature2 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_22_outside)
-        print("sensor - reading - finished...")
+        sensorLogging.logger.info('Finished Reading Adafruit_DHT.22 sensors on pin (4(inside) and 22(outside))')
         return (SensorValue(temperature1,humidity1), SensorValue(temperature2,humidity2), datetime.now()) 
     else:
         humidity1, temperature1 = Adafruit_DHT.read(sensor_type, sensor_pin_4_inside)
@@ -196,4 +192,4 @@ ApiThread(
     config.debug
 ).start()
 
-print ("api.py ... Exiting Main Thread")
+sensorLogging.logger("Exiting main thread.")

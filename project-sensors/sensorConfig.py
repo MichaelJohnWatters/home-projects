@@ -1,5 +1,6 @@
 import json
 import Adafruit_DHT
+import logging
 
 #Class
 class SensorConfig:
@@ -14,7 +15,8 @@ class SensorConfig:
         sensor_read_delay,
         api_running_flag,
         sensor_running_flag,
-        ingestion_file_path
+        ingestion_file_path,
+        logging_level
         ):
         self.host                  = host
         self.port                  = port
@@ -29,6 +31,7 @@ class SensorConfig:
         self.api_running_flag      = api_running_flag 
         self.sensor_running_flag   = sensor_running_flag
         self.ingestion_file_path   = ingestion_file_path
+        self.logging_level         = logging_level
 
 with open('./config.json') as config_file:
     loadConfig = json.load(config_file)
@@ -40,6 +43,12 @@ def sensorType(sensorType):
         return Adafruit_DHT.DHT11
     else:
         print("ERROR: Config Unable to detect sensor type")
+
+def loggingLevel(loggingLevel):
+    if loggingLevel == "INFO":
+        return logging.INFO
+    else:
+        return logging.DEBUG
 
 config = SensorConfig(
     host                  = loadConfig['sensors']['host'],
@@ -54,7 +63,8 @@ config = SensorConfig(
     sensor_read_delay     = loadConfig['sensors']['sensor_read_delay'],
     api_running_flag      = loadConfig['sensors']['api_running_flag'],
     sensor_running_flag   = loadConfig['sensors']['sensor_running_flag'],
-    ingestion_file_path   = loadConfig['sensors']['ingestion_file_path']
+    ingestion_file_path   = loadConfig['sensors']['ingestion_file_path'],
+    logging_level         = loggingLevel(loadConfig['sensors']['logging-level']),
 )
 
 

@@ -1,3 +1,6 @@
+
+https://druid.apache.org/docs/latest/tutorials/tutorial-batch.html#loading-data-with-a-spec-via-command-linebnnmjbnmj
+
 TO RUN
 
 chmod a+x ./run.sh

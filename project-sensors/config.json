@@ -12,6 +12,7 @@
         "sensor_read_delay" : 3,
         "api_running_flag" : true,
         "sensor_running_flag" : true,
-        "ingestion_file_path": "ingest.txt"
+        "ingestion_file_path": "ingest.txt",
+        "logging-level": "INFO"
     }
 }
