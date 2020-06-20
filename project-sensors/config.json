@@ -9,7 +9,7 @@
         "sensor_thread_running" : true,
         "sensor_retry" : true,
         "sensor_grouping_size" : 3,
-        "sensor_read_delay" : 3,
+        "sensor_read_delay" : 20,
         "api_running_flag" : true,
         "sensor_running_flag" : true,
         "ingestion_file_path": "ingest.txt",

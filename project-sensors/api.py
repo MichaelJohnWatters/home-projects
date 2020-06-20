@@ -1,14 +1,18 @@
 import time
 import json
+import os
 import logging
 import threading
 import sensorConfig
 import Adafruit_DHT
 import sensorLogging
+import requests
+from gpiozero import CPUTemperature
 from   flask         import Flask
 from   flask_restful import Api, Resource
 from   datetime      import datetime  
-from   datetime      import timedelta  
+from   datetime      import timedelta
+import psutil
 
 #Config
 config = sensorConfig.config
@@ -23,11 +27,22 @@ last_read_datetime       = 0.0
 #list of grouped reads, to reduce http requests sent to druid by grouping reads.
 list_sensor_reads = list()
 
+def postDruidIngestionTask():
+    #This will list all the files in present #working directory
+    sensorLogging.logger.info('POST http://localhost:8081 Druid ingestion Task')
+    os.system("bin/post-index-task --file data/temp.json --url http://localhost:8081")
+    
 def writeToFile(content, file_path):
     f = open("./data/ingest.json", "w")
     f.write(toDruidFormattedJson(list_sensor_reads))
-    sensorLogging.logger.info('druid data written to ./project-sensors/data/ingest.json')
     f.close()
+    sensorLogging.logger.info('druid data written to ./project-sensors/data/ingest.json')
+    sensorLogging.logger.info(
+        f'CPU usage: {psutil.cpu_percent()}%, ' +
+        f'Temperature: {CPUTemperature().temperature}C, ' +
+        f'Memory usage: {psutil.virtual_memory()[2]}%')
+    postDruidIngestionTask()
+
 
 #Endpoint Class
 class SensorNow(Resource):

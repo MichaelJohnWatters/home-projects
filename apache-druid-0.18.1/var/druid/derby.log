@@ -1,16 +1,15 @@
-Thu Jun 04 19:24:14 UTC 2020 : Apache Derby Network Server - 10.14.2.0 - (1828579) started and ready to accept connections on port 1527
+Sat Jun 20 15:46:00 UTC 2020 : Apache Derby Network Server - 10.14.2.0 - (1828579) started and ready to accept connections on port 1527
 ----------------------------------------------------------------
-Thu Jun 04 19:24:14 UTC 2020:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0172-80ca-8162-00000db4ec18 
-on database directory /home/michael/repo/home-projects/apache-druid-0.18.1/var/druid/metadata.db with class loader sun.misc.Launcher$AppClassLoader@58d25a40 
-Loaded from file:/home/michael/repo/home-projects/apache-druid-0.18.1/lib/derby-10.14.2.0.jar
-java.vendor=Private Build
-java.runtime.version=1.8.0_252-8u252-b09-1ubuntu1-b09
-user.dir=/home/michael/repo/home-projects/apache-druid-0.18.1
+Sat Jun 20 15:46:02 UTC 2020:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0172-d268-7331-00000d63f210 
+on database directory /home/pi/repo/home-projects/apache-druid-0.18.1/var/druid/metadata.db with class loader sun.misc.Launcher$AppClassLoader@6ce253f1 
+Loaded from file:/home/pi/repo/home-projects/apache-druid-0.18.1/lib/derby-10.14.2.0.jar
+java.vendor=AdoptOpenJDK
+java.runtime.version=1.8.0_232-b09
+user.dir=/home/pi/repo/home-projects/apache-druid-0.18.1
 os.name=Linux
-os.arch=amd64
-os.version=5.4.0-33-generic
+os.arch=aarch64
+os.version=5.4.42-v8+
 derby.system.home=null
 derby.stream.error.file=var/druid/derby.log
 Database Class Loader started - derby.database.classpath=''
-Thu Jun 04 19:24:17 UTC 2020 : Apache Derby Network Server - 10.14.2.0 - (1828579) shutdown

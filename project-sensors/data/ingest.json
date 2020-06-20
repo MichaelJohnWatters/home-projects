@@ -1,6 +1,6 @@
-{"timestamp": "2020-06-14 17:48:55.295264", "location": "inside", "temperature": 23.399999618530273, "humidity": 58.900001525878906}
-{"timestamp": "2020-06-14 17:48:55.295264", "location": "outside", "temperature": 23.299999237060547, "humidity": 54.29999923706055}
-{"timestamp": "2020-06-14 17:48:59.348535", "location": "inside", "temperature": 23.399999618530273, "humidity": 58.900001525878906}
-{"timestamp": "2020-06-14 17:48:59.348535", "location": "outside", "temperature": 23.299999237060547, "humidity": 54.29999923706055}
-{"timestamp": "2020-06-14 17:49:03.405007", "location": "inside", "temperature": 23.399999618530273, "humidity": 58.79999923706055}
-{"timestamp": "2020-06-14 17:49:03.405007", "location": "outside", "temperature": 23.299999237060547, "humidity": 54.20000076293945}
+{"timestamp": "2020-06-20 19:03:51.164368", "location": "inside", "temperature": 22.5, "humidity": 53.099998474121094}
+{"timestamp": "2020-06-20 19:03:51.164368", "location": "outside", "temperature": 22.399999618530273, "humidity": 60.400001525878906}
+{"timestamp": "2020-06-20 19:04:12.235687", "location": "inside", "temperature": 22.5, "humidity": 53.400001525878906}
+{"timestamp": "2020-06-20 19:04:12.235687", "location": "outside", "temperature": 22.299999237060547, "humidity": 60.79999923706055}
+{"timestamp": "2020-06-20 19:04:33.307212", "location": "inside", "temperature": 22.399999618530273, "humidity": 53.29999923706055}
+{"timestamp": "2020-06-20 19:04:33.307212", "location": "outside", "temperature": 22.299999237060547, "humidity": 60.900001525878906}
