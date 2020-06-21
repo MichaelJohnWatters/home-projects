@@ -14,3 +14,7 @@ services:
         devices: 
             - /dev/gpiomem:/dev/gpiomem
         privileged: true
+    website-service:
+        build: .
+        ports:
+            - 5002:8080

@@ -28,19 +28,16 @@ last_read_datetime       = 0.0
 list_sensor_reads = list()
 
 def postDruidIngestionTask():
-    #This will list all the files in present #working directory
     sensorLogging.logger.info('POST http://localhost:8081 Druid ingestion Task')
-    os.system("bin/post-index-task --file data/temp.json --url http://localhost:8081")
+    #Probably should replace with post request instead of this bash command tho we gett logging from druid and stuff,
+    # so might acctualy keep it.
+    os.system("bin/post-index-task --file data/druidSpec.json --url http://localhost:8081")
     
 def writeToFile(content, file_path):
     f = open("./data/ingest.json", "w")
     f.write(toDruidFormattedJson(list_sensor_reads))
     f.close()
     sensorLogging.logger.info('druid data written to ./project-sensors/data/ingest.json')
-    sensorLogging.logger.info(
-        f'CPU usage: {psutil.cpu_percent()}%, ' +
-        f'Temperature: {CPUTemperature().temperature}C, ' +
-        f'Memory usage: {psutil.virtual_memory()[2]}%')
     postDruidIngestionTask()
 
 
@@ -178,7 +175,7 @@ def readSensors(sensor_type, sensor_pin_4_inside, sensor_pin_22_outside, bool_se
     if bool_sensor_retry == True:
         humidity1, temperature1 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_4_inside)
         humidity2, temperature2 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_22_outside)
-        sensorLogging.logger.info('Finished Reading Adafruit_DHT.22 sensors on pin (4(inside) and 22(outside))')
+        sensorLogging.logger.info('Finished reading Adafruit_DHT.22 sensors, ' +f'CPU usage: {psutil.cpu_percent()}%, '+f'Temperature: {CPUTemperature().temperature}C, ' +f'Memory usage: {psutil.virtual_memory()[2]}%')
         return (SensorValue(temperature1,humidity1), SensorValue(temperature2,humidity2), datetime.now()) 
     else:
         humidity1, temperature1 = Adafruit_DHT.read(sensor_type, sensor_pin_4_inside)

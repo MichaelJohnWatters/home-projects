@@ -1,0 +1,117 @@
+{
+    "type": "index_parallel",
+    "spec": {
+      "dataSchema": {
+        "dataSource": "test_data_2",
+        "timestampSpec": {
+          "column": "timestamp",
+          "format": "auto",
+          "missingValue": null
+        },
+        "dimensionsSpec": {
+          "dimensions": [
+            {
+              "type": "float",
+              "name": "humidity",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": false
+            },
+            {
+              "type": "string",
+              "name": "location",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": true
+            },
+            {
+              "type": "float",
+              "name": "temperature",
+              "multiValueHandling": "SORTED_ARRAY",
+              "createBitmapIndex": false
+            }
+          ],
+          "dimensionExclusions": [
+            "timestamp"
+          ]
+        },
+        "metricsSpec": [],
+        "granularitySpec": {
+          "type": "uniform",
+          "segmentGranularity": "DAY",
+          "queryGranularity": "MINUTE",
+          "rollup": false,
+          "intervals": null
+        }
+      },
+      "ioConfig": {
+        "type": "index_parallel",
+        "inputSource": {
+          "type": "local",
+          "baseDir": "/home/pi/repo/home-projects/project-sensors/data",
+          "filter": "ingest.json",
+          "files": []
+        },
+        "inputFormat": {
+          "type": "json",
+          "flattenSpec": {
+            "useFieldDiscovery": true,
+            "fields": []
+          },
+          "featureSpec": {}
+        },
+        "appendToExisting": true
+      },
+      "tuningConfig": {
+        "type": "index_parallel",
+        "maxRowsPerSegment": 5000000,
+        "maxRowsInMemory": 1000000,
+        "maxBytesInMemory": 0,
+        "maxTotalRows": null,
+        "numShards": null,
+        "splitHintSpec": null,
+        "partitionsSpec": {
+          "type": "dynamic",
+          "maxRowsPerSegment": 5000000,
+          "maxTotalRows": null
+        },
+        "indexSpec": {
+          "bitmap": {
+            "type": "roaring",
+            "compressRunOnSerialization": true
+          },
+          "dimensionCompression": "lz4",
+          "metricCompression": "lz4",
+          "longEncoding": "longs"
+        },
+        "indexSpecForIntermediatePersists": {
+          "bitmap": {
+            "type": "roaring",
+            "compressRunOnSerialization": true
+          },
+          "dimensionCompression": "lz4",
+          "metricCompression": "lz4",
+          "longEncoding": "longs"
+        },
+        "maxPendingPersists": 0,
+        "forceGuaranteedRollup": false,
+        "reportParseExceptions": false,
+        "pushTimeout": 0,
+        "segmentWriteOutMediumFactory": null,
+        "maxNumConcurrentSubTasks": 1,
+        "maxRetry": 3,
+        "taskStatusCheckPeriodMs": 1000,
+        "chatHandlerTimeout": "PT10S",
+        "chatHandlerNumRetries": 5,
+        "maxNumSegmentsToMerge": 100,
+        "totalNumMergeTasks": 10,
+        "logParseExceptions": false,
+        "maxParseExceptions": 2147483647,
+        "maxSavedParseExceptions": 0,
+        "buildV9Directly": true,
+        "partitionDimensions": []
+      }
+    },
+    "context": {
+      "forceTimeChunkLock": true
+    },
+    "dataSource": "test_data_2"
+  }
