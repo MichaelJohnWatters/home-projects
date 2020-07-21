@@ -20,28 +20,89 @@ I think a bunch of stuff needs to be installed in docker files, cause it seems t
 
 # home-projects
 
+DISCLAIMER might break your pi.
+
+
 Requirements
 Hardware 
-- rasberry pi 4B 4GB version
+- rasberry pi 4B 4GB version, 8GB is recommened.
 - 2x DHT22 sensors
+- micro sd card
+- SSD (pi does not support some ssds) TODO LINK HERE
+- USB to SATA connector (some connects do not work find compatible) TODO LINK HERE
 - wire (optional)
 - soldering iron (optional)
 
-Rasberry Pi 4B 
+Software
+RasberryPi OS 64 bit
 
-Pi Pre-Setup
-boot os 2020-05-27-raspios-buster-arm64.img
-- downloaded from https://www.raspberrypi.org/forums/viewtopic.php?t=275370 (current in beta testing, might change by the time your reading)
+SSD SETUP
 
-Use rasberry pi imager to load os on to your ssd.
-- https://www.raspberrypi.org/downloads/ 
+1. Installation of RasberryPi OS 64 bit
 
-- insert sd card,(as ssd would probably be better but i used a 32gb sd card)
+Follow the guide here : https://www.jeffgeerling.com/blog/2020/im-booting-my-raspberry-pi-4-usb-ssd
 
-- attach sensors, by default the app uses pin 4 and pin 22 for data between sensor and pi.
+Summary of Guide above :
 
-- turn on pi
+On your other device:
+1. Download rasberry pi imager (https://www.raspberrypi.org/downloads/)
 
+On your other device:
+2. Download Rasberry Pi OS 64 bit Image (currently a BETA build, as of 21/07/2020)
+  - https://downloads.raspberrypi.org/raspios_arm64/images/raspios_arm64-2020-05-28/2020-05-27-raspios-buster-arm64.zip
+
+On your other device:
+3. Flash SD Card with (the above imager), using the rasberry pi imager.
+
+4. Insert SD card, and boot rasberry pi.
+
+5. In Terminal :
+                - sudo apt update
+                - sudo apt full-upgrade
+
+6. In Terminal :
+                - sudo nano /etc/default/rpi-eeprom-update
+                - change 'critical' to 'stable' then (write, exit) => (ctrl o, ctrl x) 
+                
+7. Update eeprom(in terminal) :
+                - sudo rpi-eeprom-update -d -f /lib/firmware/raspberrypi/bootloader/stable/pieeprom-2020-06-15.bin
+
+Reboot your pi and check the bootloader version(in terminal):
+                                        - vcgencmd bootloader_version
+
+
+8. While your pi is running, plug your SSD into the pi (if the pi can detect the ssd you should see a notifcation on screen).
+   If you dont you can run in the Terminal:
+        - lsusb (before and after plugging in your ssd), to see if it has been detected(many usb to sata/ssds dont work for pi's)
+        
+8. If SSD is detected, unplug the SSD.
+
+9. On your other device plug the ssd in and flash the same image above using the rasberry pi imager (dont unplug after finshing).
+
+As of 21/07/2020, setup 10,11 may or may not be required in future, once rpi OS 64 has a stable build.
+10. Once complete download/clone (This next part might be easier to do on linux or mac):
+- https://github.com/raspberrypi/firmware
+
+11. Navitage to your recently flashed SSD's boot folder and boot folder of the downloaded firmware above,
+    Replace all the files on the SSD boot file ending in .elf or .dat, with the downloaded versions above.
+    
+12. Unplug your SSD, turn off your Rasberry PI and plug in the flashed SSD into a 3.0 USB port, removing the SD card.
+
+13. Boot the rasberry pi, if it loads to the desktop it was sucessfuly :)
+
+14. If 13 failed. Turn off and unplug the pi from the mains power. Go make a cup of tea and comeback and re-boot the pi.
+
+
+SOFTWARE SETUP 
+
+python
+java8
+docker
+apache-druid
+vuejs
+
+
+                        
 Pi Setup
 
 After normal setup:
