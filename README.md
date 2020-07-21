@@ -47,11 +47,9 @@ Summary of Guide above :
 On your other device:
 1. Download rasberry pi imager (https://www.raspberrypi.org/downloads/)
 
-On your other device:
 2. Download Rasberry Pi OS 64 bit Image (currently a BETA build, as of 21/07/2020)
   - https://downloads.raspberrypi.org/raspios_arm64/images/raspios_arm64-2020-05-28/2020-05-27-raspios-buster-arm64.zip
 
-On your other device:
 3. Flash SD Card with (the above imager), using the rasberry pi imager.
 
 4. Insert SD card, and boot rasberry pi.
@@ -95,17 +93,7 @@ As of 21/07/2020, setup 10,11 may or may not be required in future, once rpi OS 
 
 SOFTWARE SETUP 
 
-python
-java8
-docker
-apache-druid
-vuejs
-
-
-                        
-Pi Setup
-
-After normal setup:
+Update
 - sudo apt update
 - sudo apt upgrade
 
@@ -113,47 +101,38 @@ Install Docker and docker-compose
 - sudo apt install docker
 - sudo apt install docker-compose
 
-Druid
-Needs java 8 for druid, java 8 not realy supported for rasberry pi os 64/deb buster
-This worked for me, however this may change.
-- https://adoptopenjdk.net/installation.html#linux-pkg
-
-Java 8 setup as above:
-- sudo wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
-
-- sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
-
-- sudo wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
-
-Note if you get "command not found", in some cases add-apt-repository command will be missing.
+Java8 (required by apache-druid)
+Guide: https://adoptopenjdk.net/installation.html#linux-pkg
+Summary of Guide:
 - sudo apt-get install -y software-properties-common
-
-- wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
-
+- sudo wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
+- sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
 - sudo apt-get install adoptopenjdk-8-hotspot
-
 - java --version
 
-should show
-openjdk version "1.8.0_232"
-OpenJDK Runtime Environment (AdoptOpenJDK)(build 1.8.0_232-b09)
-OpenJDK 64-Bit Server VM (AdoptOpenJDK)(build 25.232-b09, mixed mode)
+openjdk version "1.8.0_262"
+OpenJDK Runtime Environment (build 1.8.0_262-b10)
+OpenJDK 64-Bit Server VM (build 25.262-b10, mixed mode)
 
-If it shows a differnt version run <sudo update-alternatives --config java>, 
-and follow instructions to set it to: 
-  </usr/lib/jvm/adoptopenjdk-8-hotspot-arm64/bin/java>
-  
+If your java version is wrong/not working uses(normally if you have mutiple java versions installed): 
+- sudo update-alternatives --config java
+- and follow instructions to set it to: </usr/lib/jvm/adoptopenjdk-8-hotspot-arm64/bin/java>
+ 
+INSTALL PROJECT
+
+git clone 
+ 
 Note before running druid, refer to https://druid.apache.org/docs/latest/operations/single-server.html
-Druids minimum RAM requirements are 4GB + 1 core. 
-Currently I am running a 4GB version of PI 4b, but a 8gb version has been released.
-If you are running a 4gb version I recommend, detaching monitor output + keyboard + mouse and instead ssh in.
-As my pi would freeze up otherwise when running druid. I would not recommend running druid on the 4gb pi. 
 
-NOTE: make sure your pi is well cooled, a good fan/good heat sink. Druid is a big ask from a pi.
+
+Currently I am running a 4GB version of PI 4b, but a 8gb version has been released.
+
+If you are running a 4gb version I recommend, detaching monitor output + keyboard + mouse and instead ssh in or boot in commandline mode(look about in pi settings), As my pi would freeze up/crash.
+
 
 Instead ssh into your pi:
 
-Note 'pi' here is the username/account your going to login with, you can also omit it from ssh.
+Note 'pi' here is the username/account your going to login with.
 
 From linux(mac should be the same) machine : 
 - ssh XXX.XXX.XXX.XXX@pi
