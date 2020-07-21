@@ -118,11 +118,19 @@ If your java version is wrong/not working uses(normally if you have mutiple java
 - sudo update-alternatives --config java
 - and follow instructions to set it to: </usr/lib/jvm/adoptopenjdk-8-hotspot-arm64/bin/java>
  
-INSTALL PROJECT
+CLONE PROJECT
 
-git clone 
+cd <your repo>
+
+git clone https://github.com/MichaelJohnWatters/home-projects.git
+
+CLONE DRUID
+
+cd home-projects
+
+git clone https://github.com/apache/druid.git
  
-Note before running druid, refer to https://druid.apache.org/docs/latest/operations/single-server.html
+
 
 
 Currently I am running a 4GB version of PI 4b, but a 8gb version has been released.
