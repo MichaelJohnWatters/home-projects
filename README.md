@@ -87,6 +87,12 @@ Install Docker and docker-compose
 - sudo apt install docker
 - sudo apt install docker-compose
 
+Install vue dependencies (https://cli.vuejs.org/guide/installation.html)
+- curl -sL https://deb.nodesource.com/setup_10.x | sudo bash -
+- sudo apt install nodejs
+- sudo npm install -g @vue/cli
+- sudo npm update -g @vue/cli
+
 Java8 (required by apache-druid)
 Guide: https://adoptopenjdk.net/installation.html#linux-pkg
 Summary of Guide:
@@ -116,12 +122,13 @@ cd <your repo>
 - sudo git clone https://github.com/MichaelJohnWatters/home-projects.git
 
 Install DRUID(into the home-projects folder, from website or command line)
-From: https://www.apache.org/dyn/closer.cgi?path=/druid/0.19.0/apache-druid-0.19.0-bin.tar.gz
+- From: https://www.apache.org/dyn/closer.cgi?path=/druid/0.19.0/apache-druid-0.19.0-bin.tar.gz
 - cd repo/home-projects
 - tar -xzf apache-druid-0.19.0-bin.tar.gz
 - sudo rm -r apache-druid-0.19.0-bin.tar.gz
 
-OR 
+OR
+
 Naviate to your repo/home-projects
 Get full path
 - pwd (/home/pi/repo/home-projects/)
