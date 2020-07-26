@@ -118,51 +118,45 @@ If your java version is wrong/not working uses(normally if you have mutiple java
 - sudo update-alternatives --config java
 - and follow instructions to set it to: </usr/lib/jvm/adoptopenjdk-8-hotspot-arm64/bin/java>
  
+ Install Adafruit Library (for reading sensors)
+ - sudo pip3 install Adafruit_DHT
+ 
+ Install Flask and flask-resful
+ - sudo pip3 install flask-restful
+ 
 CLONE PROJECT
 
 cd <your repo>
+- sudo git clone https://github.com/MichaelJohnWatters/home-projects.git
 
-git clone https://github.com/MichaelJohnWatters/home-projects.git
+Install DRUID(into the home-projects folder, from website or command line)
+From: https://www.apache.org/dyn/closer.cgi?path=/druid/0.19.0/apache-druid-0.19.0-bin.tar.gz
+- cd repo/home-projects
+- tar -xzf apache-druid-0.19.0-bin.tar.gz
+- sudo rm -r apache-druid-0.19.0-bin.tar.gz
 
-CLONE DRUID
+OR 
+Naviate to your repo/home-projects
+Get full path
+- pwd (/home/pi/repo/home-projects/)
+Then run with YOUR path:
+- sudo wget -P /home/pi/repo/home-projects/ "http://apache.mirror.anlx.net/druid/0.19.0/apache-druid-0.19.0-bin.tar.gz"
+- sudo tar -xzf apache-druid-0.19.0-bin.tar.gz
+- sudo rm -r apache-druid-0.19.0-bin.tar.gz
 
-cd home-projects
-
-git clone https://github.com/apache/druid.git
- 
-
-
-
+Test it works:
 Currently I am running a 4GB version of PI 4b, but a 8gb version has been released.
-
 If you are running a 4gb version I recommend, detaching monitor output + keyboard + mouse and instead ssh in or boot in commandline mode(look about in pi settings), As my pi would freeze up/crash.
-
-
-Instead ssh into your pi:
-
-Note 'pi' here is the username/account your going to login with.
-
-From linux(mac should be the same) machine : 
-- ssh XXX.XXX.XXX.XXX@pi
-- ssh XXX.XXX.XXX.XXX
-
-Note if you dont know your devices ip you can in a pi terminal run(might have to install but should be there)
-- ifconfig
-- Your device ip is here: <UP,BROADCAST,RUNNING,MULTICAST> inet XXX.XXX.XXX.XXX
- 
-From windows, download https://www.putty.org/
-And use this app too ssh(this is what I use atm).
-
-Finally run druid (only use nano-quick-start, pi wont be able to cope with anything else).
-
-Running Druid:
-cd into where ever you installed apache druid.
-- cd /repo/apache-druid-0.18.1./
-Finally run nano quick start 
+- cd apache-druid-0.19.0
 - ./bin/start-nano-quickstart
 
-Navigate to (your pi's device ip)
-http://XXX.XXX.XXX.XXX:8888
+Navigate to, to check it works.
+192.168.1.218:8888/unified-console.html
+
+In /repo/home-projects/
+chmod a+x ./run.sh
+chmod a+x ./run-druid.sh
+chmod a+x ./drun.sh
 
 DONE!
 
@@ -189,8 +183,6 @@ test project-go-api DockerFile
 
 sudo docker build -t michaeljohnwatters/project-go-api .
 sudo docker run --publish 8080:8080 -t michaeljohnwatters/project-go-api
-
-
 
 handy docker commands
 stop all
