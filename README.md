@@ -151,6 +151,13 @@ chmod a+x ./run.sh
 chmod a+x ./run-druid.sh
 chmod a+x ./drun.sh
 
+INSTALL FIREWALL (https://www.raspberrypi.org/documentation/configuration/security.md)
+
+- sudo apt install ufw
+- sudo ufw enable
+- sudo ufw allow 8080/tcp
+- sudo ufw allow 5000/tcp
+
 DONE!
 
 now refer to druid docs on how druid works https://druid.apache.org/docs/latest/tutorials/index.html
