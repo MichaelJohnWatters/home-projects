@@ -158,6 +158,11 @@ INSTALL FIREWALL (https://www.raspberrypi.org/documentation/configuration/securi
 - sudo ufw allow 8080/tcp
 - sudo ufw allow 5000/tcp
 
+fail2ban
+- sudo apt install fail2ban
+- sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+- sudo nano /etc/fail2ban/jail.local            (for config)
+
 DONE!
 
 now refer to druid docs on how druid works https://druid.apache.org/docs/latest/tutorials/index.html
