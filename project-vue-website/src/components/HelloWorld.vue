@@ -52,7 +52,7 @@ export default {
           'Origin': 'x-requested-with'
         }
       }
-      const joke = await axios.get('https://cors-anywhere.herokuapp.com/http://sprinklesloltemps.ddns.net:5000/sensors/now', config
+      const joke = await axios.get('https://cors-anywhere.herokuapp.com/http://sprinklesloltemps.ddns.net:8080/sensors/now', config
        ).then(response => {
          this.insideTemp = response.data.inside.temperature,
          this.insideHum = response.data.inside.humidity,

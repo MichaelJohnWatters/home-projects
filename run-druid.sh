@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo ./apache-druid-0.18.1/bin/start-nano-quickstart
+sudo ./apache-druid-0.19.0/bin/start-nano-quickstart
