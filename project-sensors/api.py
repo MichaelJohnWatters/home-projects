@@ -48,15 +48,14 @@ class SensorNow(Resource):
         global last_read_datetime
 
         return {
-            str(last_read_datetime):{
-                    'inside':{
-                        "temperature": last_temperature_inside,
-                        "humidity"   : last_humdity_inside
-                    },
+            'timestamp': f"{str(last_read_datetime)}",
+            'inside':{
+                    "temperature": last_temperature_inside,
+                    "humidity"   : last_humdity_inside
+                },
                     'outside':{
-                        "temperature": last_temperature_outside,
-                        "humidity"   : last_humdity_outside
-                    }
+                    "temperature": last_temperature_outside,
+                    "humidity"   : last_humdity_outside
                 }
             }
 
