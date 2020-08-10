@@ -2,7 +2,7 @@
     "type": "index_parallel",
     "spec": {
       "dataSchema": {
-        "dataSource": "test_data_2",
+        "dataSource": "sensor_reads",
         "timestampSpec": {
           "column": "timestamp",
           "format": "auto",
@@ -113,5 +113,5 @@
     "context": {
       "forceTimeChunkLock": true
     },
-    "dataSource": "test_data_2"
+    "dataSource": "sensor_reads"
   }

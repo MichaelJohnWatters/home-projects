@@ -37,14 +37,6 @@ def writeToFile(content, file_path):
     f.close()
     druidBashIngestionTask()
 
-class UsageNow(Resource):
-    def get(self):
-        return {
-            'cpu': f"{str(psutil.cpu_percent())}%",
-            'temperature':  f"{str(CPUTemperature().temperature)}C",
-            'memory':  f"{str(psutil.virtual_memory()[2])}%"
-        }
-
 #Endpoint Class
 class SensorNow(Resource):
     def get(self):
@@ -69,10 +61,9 @@ class SensorNow(Resource):
 
 #Class
 class SensorValue:
-    def __init__(self, temperature, humdity, location):
+    def __init__(self, temperature, humdity):
         self.temperature = temperature
         self.humdity = humdity
-        self.location = location
 
 #TODO this method is shit fix it
 def toDruidFormattedJson(listOfReads):
@@ -84,13 +75,13 @@ def toDruidFormattedJson(listOfReads):
 
         responseInside = {
             "timestamp"  :timestamp,
-            "location"   :sensorVal[0].location,
+            "location"   :"inside",
             "temperature":sensorVal[0].temperature,
             "humidity"   :sensorVal[0].humdity
         }
         responseOutside = {
             "timestamp"  :timestamp,
-            "location"   :sensorVal[1].location,
+            "location"   :"outside",
             "temperature":sensorVal[1].temperature,
             "humidity"   :sensorVal[1].humdity
         }
@@ -119,7 +110,6 @@ class ApiThread(threading.Thread):
         app = Flask(__name__)
         api = Api(app)
         api.add_resource(SensorNow,'/sensors/now')
-        api.add_resource(UsageNow,'/usage')
         app.run(host=self.host, port=self.port,debug=self.debug)
         sensorLogging.logger.info(f"Stopping :{self.name} thread.")
 
@@ -154,21 +144,11 @@ def read(threadName, runningFlag, readDelay, sensortype, pin1, pin2, sensorRetry
         readings = readSensors(sensortype, pin1, pin2, sensorRetry)
 
         #set lastest read values
-        # this block is pointless inside is always position [0]
-        if(readings[0].location == 'inside'):
-            last_read_datetime       = readings[2]
-            last_temperature_inside  = readings[0].temperature
-            last_humdity_inside      = readings[0].humdity
-
-            last_temperature_outside = readings[1].temperature
-            last_humdity_outside     = readings[1].humdity
-        else:
-            last_read_datetime       = readings[2]
-            last_temperature_inside  = readings[1].temperature
-            last_humdity_inside      = readings[1].humdity
-
-            last_temperature_outside = readings[0].temperature
-            last_humdity_outside     = readings[0].humdity
+        last_temperature_inside  = readings[0].temperature
+        last_temperature_outside = readings[1].temperature
+        last_humdity_inside      = readings[0].humdity
+        last_humdity_outside     = readings[1].humdity
+        last_read_datetime       = readings[2]
 
         #stick into list of sensor reads
         list_sensor_reads.append(readings)
@@ -185,15 +165,16 @@ def readSensors(sensor_type, sensor_pin_4_inside, sensor_pin_22_outside, bool_se
     if bool_sensor_retry == True:
         humidity1, temperature1 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_4_inside)
         humidity2, temperature2 = Adafruit_DHT.read_retry(sensor_type, sensor_pin_22_outside)
+        humidity1 = humidity1+15
         sensorLogging.logger.info(f'Finished reading Adafruit_DHT.22, inside  Temperature: {temperature1}C, Humdity: {humidity1}%')
         sensorLogging.logger.info(f'Finished reading Adafruit_DHT.22, outside Temperature: {temperature2}C, Humdity: {humidity2}%')
         sensorLogging.logger.info('Resource stats: ' +f'CPU usage: {psutil.cpu_percent()}%, '+f'Temperature: {CPUTemperature().temperature}C, ' +f'Memory usage: {psutil.virtual_memory()[2]}%')
-        return (SensorValue(temperature1, humidity1,"inside"), SensorValue(temperature2, humidity2,"outside"), timestamp) 
+        return (SensorValue(temperature1, humidity1), SensorValue(temperature2, humidity2), timestamp) 
     else:
         humidity1, temperature1 = Adafruit_DHT.read(sensor_type, sensor_pin_4_inside)
         humidity2, temperature2 = Adafruit_DHT.read(sensor_type, sensor_pin_22_outside)
         if humidity1 is not None and temperature1 is not None and humidity2 is not None and temperature2 is not None:
-            return (SensorValue(temperature1,humidity1,"inside"), SensorValue(temperature2,humidity2,"outside"), timestamp)
+            return (SensorValue(temperature1,humidity1), SensorValue(temperature2,humidity2), timestamp)
         else:
             raise Exception("retry off, not all reads succedded")
 
