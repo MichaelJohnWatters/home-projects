@@ -18,6 +18,15 @@ export default {
 </script>
 
 <style>
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(135deg, #78d8aa 0%,#50b1ed 52%,#4f68e9 100%); /* Standard syntax (must be last) */
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

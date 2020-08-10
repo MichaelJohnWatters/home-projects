@@ -1,30 +1,36 @@
 <template>
   <div class="hello">
-    <h2>Most Recent Reads</h2>
-    <p>Sensors are read once per minute.</p>
-    <p>Both sensors currently inside.</p>
-    <div v-if="joke">
-      <p>{{joke}}</p>
-    </div>
+    <h1>Most Recent Reads</h1>
+    <h3>Sensors are read once per minute, Both sensors currently inside.</h3>
+    <div class="card card-1">
+    <h1>Inside</h1>
     <div v-if="timestamp">
-      <p>Timestamp of last read: {{timestamp}} </p>
+      <p>Timestamp: {{timestamp}}</p>
     </div>
     <div v-if="insideTemp">
-      <p>Inside Temperature: {{insideTemp}}°C </p>
-    </div>
-      <div v-if="outsideTemp">
-      <p>Outside Temperature: {{outsideTemp}}°C </p>
+      <p>Temperature: {{Number((insideTemp).toFixed(1))}}°C</p>
     </div>
     <div v-if="insideHum">
-      <p>Inside Humidity: {{insideHum}} % </p>
+      <p>Humidity: {{Number((insideHum).toFixed(1))}}%</p>
+    </div>
+    </div>
+    <div class="card card-1">
+    <h1>Outside</h1>
+    <div v-if="timestamp">
+      <p>Timestamp: {{timestamp}}</p>
+    </div>
+      <div v-if="outsideTemp">
+      <p>Temperature: {{Number((outsideTemp).toFixed(1))}}°C</p>
     </div>
     <div v-if="outsideHum">
-      <p><bold>Outside Humidity:</bold> {{outsideHum}} % </p>
+      <p>Humidity: {{Number((outsideHum).toFixed(1))}}%</p>
     </div>
-</div>
+    </div>
+  </div>
 </template>
 
 <script>
+
 import axios from 'axios';
 export default {
   name: 'HelloWorld',
@@ -38,7 +44,7 @@ export default {
       insideTemp: '',
       insideHum: '',
       outsideTemp: '',
-      outsideHum: '',
+      outsideHum: ''
     }
   },
     beforeMount() {
@@ -67,19 +73,38 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.hello {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+
+body {
+  background: #e2e1e0;
+  text-align: center;
 }
-li {
+
+.card {
+  font-size: 1.75em;
+  color: #2c3e50;
+  background: lavender;
+  border-radius: 25px;
   display: inline-block;
-  margin: 0 10px;
+  height: 400px;
+  margin: 1rem;
+  position: relative;
+  width: 40%;
 }
-a {
-  color: #42b983;
+.card-1 {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+.card-1:hover {
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 </style>

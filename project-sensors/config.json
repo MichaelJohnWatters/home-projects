@@ -9,7 +9,7 @@
         "sensor_thread_running" : true,
         "sensor_retry"          : true,
         "sensor_grouping_size"  : 60,
-        "sensor_read_delay"     : 5,
+        "sensor_read_delay"     : 59,
         "api_running_flag"      : true,
         "sensor_running_flag"   : true,
         "logging-level"         : "INFO"
