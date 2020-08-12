@@ -13,6 +13,7 @@ from   flask_restful import Api, Resource
 from   datetime      import datetime  
 from   datetime      import timedelta
 from   gpiozero      import CPUTemperature
+from   flask_cors    import CORS
 
 #Config
 config = sensorConfig.config
@@ -117,6 +118,10 @@ class ApiThread(threading.Thread):
     def run(self):
         sensorLogging.logger.info(f"Running : {self.name} thread.")
         app = Flask(__name__)
+        cors = CORS(app, resources={
+            r"/sensors/now": {
+                "Access-Control-Allow-Origin": "http://sprinklesloltemps.ddns.net:5000"
+                }})
         api = Api(app)
         api.add_resource(SensorNow,'/sensors/now')
         api.add_resource(UsageNow,'/usage')

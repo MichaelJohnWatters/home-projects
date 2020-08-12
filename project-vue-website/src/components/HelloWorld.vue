@@ -54,11 +54,10 @@ export default {
     async refreshTemps(){
       let config = {
         headers: {
-          'Accept': 'application/json',
-          'Origin': 'x-requested-with'
+         
         }
       }
-      const joke = await axios.get('https://cors-anywhere.herokuapp.com/http://sprinklesloltemps.ddns.net:8080/sensors/now', config
+      const joke = await axios.get('http://sprinklesloltemps.ddns.net:8080/sensors/now', config
        ).then(response => {
          this.insideTemp = response.data.inside.temperature,
          this.insideHum = response.data.inside.humidity,
@@ -66,6 +65,10 @@ export default {
          this.outsideHum = response.data.outside.humidity,
          this.timestamp  = response.data.timestamp,
          this.joke = joke.data.timestamp;
+       }).catch((error) => {
+         if (error.response){
+           console.log(error.response.data)
+         }
        });
     }
   }

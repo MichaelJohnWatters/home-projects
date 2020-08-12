@@ -1,4 +1,4 @@
 #!/bin/bash
-cd project-vue-website && serve -s dist
+cd project-vue-website && npm run build && serve -s dist
 
 
